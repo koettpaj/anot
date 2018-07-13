@@ -119,6 +119,12 @@
     <script src="controllers.js"></script>
 </head>
 <body>
+<video autoplay width="1280" height="480" controls  style="display:none" id="vidya">
+    <source src="" type="video/mp4">
+
+
+</video>
+
     <div class="ui grid">
         <div class ="row" id="header">
             <div class="three wide column">
@@ -155,7 +161,7 @@
 
                                 <i class="file image outline icon"></i>
                                 Ladda in
-                                <input name="files[]" type="file" id="fileLoad" style="display:none" multiple>
+                                <input name="files[]" type="file" id="fileLoad" style="display:none">
 
                             </a>
                             </label>

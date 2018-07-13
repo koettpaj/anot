@@ -5,37 +5,32 @@ const zoom = document.getElementById('zoom');
 
 
 canvas.addEventListener('click', function() {
-
+    drawImg(1)
 
 }, false);
 
-const imgelement = document.querySelector('img');
 
 const c = canvas.getContext('2d');
 c.imageSmoothingEnabled = false;
-const img = new Video();
-
-const reader = new FileReader();
-reader.onload = function (){
-
-    img.onload=function(){
-        drawImg(0);
+const video =  document.getElementById("vidya");
 
 
-    };
-    img.src = reader.result;
-    //imgelement.src=img
+video.addEventListener("loadedmetadata",function (){
+    console.log("hej")
 
-   // c.fillRect(20,20,150,100)
-    //console.log(reader.result)
+});
+
+video.oncanplay = function() {
+    drawImg(1)
 };
 function handleFileSelect(evt) {
-    console.log("hello")
-    console.log(evt)
+    console.log("hello");
+    console.log(evt);
     files = evt.target.files;// FileList object
-    console.log(files);
+    console.log(video);
+    video.setAttribute("src",(files[0].name));
 
-    loadImage(1)
+
 
 }
 
