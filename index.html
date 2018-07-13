@@ -11,7 +11,7 @@
         }
 
         canvas {
-            display: inline-block;
+
             background-color:grey;
             height: 480px;
             width: 1280px;
@@ -26,8 +26,9 @@
         }
         #divcanvas{
             height: 480px;
+            width:1280px;
             text-align: center;
-            width:100%;
+
             top:100px;
             padding: 0;
             margin: 0;
@@ -155,7 +156,7 @@
 
                                 <i class="file image outline icon"></i>
                                 Ladda in
-                                <input name="files[]" type="file" id="fileLoad" style="display:none" multiple>
+                                <input name="files[]" type="file" id="fileLoad" style="display:none" webkitdirectory directory multiple/>
 
                             </a>
                             </label>
@@ -200,7 +201,7 @@
             <div class="two wide column"></div>
             <div class="twelve wide column">
                 <div class="ui container" id="slideColumn">
-                <input type="range" oninput="sliderChange(this.value)" min="1" max="170" value="1" class="slider" id="myRange">
+                <input type="range" oninput="sliderChange(this.value)" min="1" max="2" value="1" class="slider" id="myRange">
                 </div>
             </div>
         </div>
