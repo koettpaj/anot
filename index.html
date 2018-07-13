@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css"/>
+    <style type="text/css">
+
+        body {
+            background-color: #343434;
+        }
+
+        canvas {
+            display: inline-block;
+            background-color:grey;
+            height: 480px;
+            width: 1280px;
+            padding: 0;
+            margin: 0;
+            image-rendering: optimizeSpeed;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: optimize-contrast;
+            -ms-interpolation-mode: nearest-neighbor;
+
+        }
+        #divcanvas{
+            height: 480px;
+            text-align: center;
+            width:100%;
+            top:100px;
+            padding: 0;
+            margin: 0;
+        }
+        .slider{
+            width:1280px;
+        }
+        #slideColumn{
+            width:1280px;
+
+        }
+
+        #header{
+            width:100%;
+            height: 65px;
+            background-color:#232323 ;
+        }
+
+        #addImagesBox{
+            height:80%;
+        }
+
+        input{
+            color: transparent;
+        }
+
+        #titleImg{
+            top:12px;
+            left: 10px;
+        }
+
+        #loadImgDiv{
+            height: 80px;
+        }
+
+        #toolbox{
+            width:100%;
+            height:  100%;
+            background-color:#232323 ;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #canvasRow{
+            height:480px;
+            margin: 0px;
+            padding: 0px;
+            background-color:#232323;
+        }
+
+
+        #menu{
+                  overflow: hidden;
+            top:36px;
+        }
+        #moveme{
+            position: relative;
+            top:100px;
+        }
+
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 50rem;
+            border-color: rgba(0, 0, 0, 0.1);
+            padding: 3px 5px;
+            background-color:#232323;
+
+
+        }
+
+        #divLimiter{
+            width:90%;
+            margin: 0 auto;
+        }
+
+        :focus {
+            outline: none !important;
+        }
+
+
+
+
+
+
+    </style>
+    <script src="controllers.js"></script>
+</head>
+<body>
+    <div class="ui grid">
+        <div class ="row" id="header">
+            <div class="three wide column">
+
+                    <img id="titleImg" class="ui tiny image" src="noot_small.png"/>
+
+            </div>
+            <div class="ten wide center aligned column">
+            <div class="ui center aligned inverted horizontal compact menu" id="toolActive">
+
+                <a class="item">
+                    <i id="zoomIcon" class="search icon"></i>
+                </a>
+                <a class="item" >
+                    <i id="moveIcon" class="hand paper outline icon"></i>
+                </a>
+                <a class="item">
+                    <i id="selectIcon" class="paint brush icon"></i>
+                </a>
+
+            </div>
+            </div>
+
+        </div>
+
+        <div class="row" id="canvasRow">
+                <div class="two wide column">
+
+                    <div class="ui two column grid" id="buttonIcons">
+                        <div class="ui container" id="moveme">
+                        <div class="ui inverted vertical compact menu" id="menu">
+                            <label for="fileLoad">
+                            <a class="item">
+
+                                <i class="file image outline icon"></i>
+                                Ladda in
+                                <input name="files[]" type="file" id="fileLoad" style="display:none" multiple>
+
+                            </a>
+                            </label>
+                            <a class="item">
+                                <i class="save outline icon"></i>
+                                Spara
+                            </a>
+                            <a class="item">
+                                <i class="images outline icon"></i>
+                                Exportera
+                            </a>
+                        </div>
+
+                        </div>
+                        <div class="ui divider"></div>
+
+
+
+
+
+
+
+
+                    </div>
+                </div>
+
+
+
+                <div class="twelve wide column">
+                     <div class="ui container" id="divcanvas">
+
+                        <canvas></canvas>
+
+                    </div>
+                </div>
+            <div class="two wide column"></div>
+
+
+
+        </div>
+        <div class="row" id="scrollRow">
+            <div class="two wide column"></div>
+            <div class="twelve wide column">
+                <div class="ui container" id="slideColumn">
+                <input type="range" oninput="sliderChange(this.value)" min="1" max="170" value="1" class="slider" id="myRange">
+                </div>
+            </div>
+        </div>
+        <div class="row" id="rest"></div>
+
+    </div>
+
+    <output id="list"></output>
+
+    <sript src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></sript>
+    <script>var files;</script>
+    <script src="canvas.js"></script>
+</body>
+</html>
