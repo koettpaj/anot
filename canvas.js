@@ -2,18 +2,37 @@ const canvas = document.querySelector('canvas');
 const zoom = document.getElementById('zoom');
 
 const slider =document.getElementById('myRange');
-var zoomValue=1;
+let zoomValue=1;
+
+
+const zoomIcon =document.getElementById('zoomIcon');
+const moveIcon =document.getElementById('moveIcon');
+const selectIcon =document.getElementById('selectIcon');
+
+
 //canvas.addEventListener("wheel", wheelZoom);
 
-var leftMouseDown=false;
-var rightMouseDown=false;
-var latestMove=[null, null];
-var lastZoomPos=[null,null];
-var latestDrag=null;
-var startZoom=[null, null];
-let isBusy=false;
+let leftMouseDown=false;
+let  rightMouseDown=false;
+let  latestMove=[null, null];
+let lastZoomPos=[null,null];
+let latestDrag=null;
+let startZoom=[null, null];
+let prevTool=null;
+let currentTool=null;
+let currentToolIcon=null;
+let zoomBlock=false;
+let textVIP=[];
+let canvasVIP=[];
+const loadCircle = document.getElementById("loadCircle");
+const loadText = document.getElementById("loadText")
+const messageBox = document.getElementById("messageBox");
+const messageHeader = document.getElementById("messageHeader");
+const messageP = document.getElementById("messageP");
+
 
 function translate(xdiff,ydiff){
+
     xdiff=xdiff/zoomValue;
     ydiff=ydiff/zoomValue;
     console.log("xdiff: "+typeof xdiff+" ydiff: "+ydiff);
@@ -24,6 +43,7 @@ function translate(xdiff,ydiff){
     let widthYTemp=img.zoomWidthY;
     xMinTemp=xMinTemp-xdiff;
     yMinTemp=yMinTemp-ydiff;
+    startZoom=[xMinTemp+widthXTemp/2 ,yMinTemp+widthYTemp/2];
 
 
     if(xMinTemp<0){
@@ -49,33 +69,40 @@ function translate(xdiff,ydiff){
 
 function dragZoom(diff){
     //console.log(diff);
+
+
+    console.log("ZOOMING");
     let xMin=0;
     let yMin=0;
     let xWidth=1280;
     let yWidth=480;
+
     if(diff<0 &&zoomValue<8){
-        x=startZoom[0];
-        y=startZoom[1];
-        zoomValue+=Math.abs(diff/100*zoomValue);
+        let x=startZoom[0]
+        let y=startZoom[1]
+        zoomValue+=Math.abs(diff/200*zoomValue);
         if(zoomValue>8){
             zoomValue=8;
         }
-        xMin=Math.round(((x)-(1280/(zoomValue*2))));
-        yMin=Math.round(y-(480/(zoomValue*2)));
-        xWidth=Math.round(1280/(zoomValue));
-        yWidth=Math.round(480/(zoomValue));}
+        xMin=(((x)-(1280/(zoomValue*2))));
+        yMin=(y-(480/(zoomValue*2)));
+        xWidth=(1280/(zoomValue));
+        yWidth=(480/(zoomValue));}
     else if(diff>0 &&zoomValue>1){
-        x=startZoom[0];
-        y=startZoom[1];
-        zoomValue-=Math.abs(diff/100*zoomValue);
+        let x=startZoom[0]
+        let y=startZoom[1]
+
+
+        zoomValue-=Math.abs(diff/200*zoomValue);
         if(zoomValue<1){
             zoomValue=1;
         }
-        xMin=Math.round(((x)-(1280/(zoomValue*2))));
-        yMin=Math.round(y-(480/(zoomValue*2)));
-        xWidth=Math.round(1280/(zoomValue));
-        yWidth=Math.round(480/(zoomValue));
+        xMin=(((x)-(1280/(zoomValue*2))));
+        yMin=(y-(480/(zoomValue*2)));
+        xWidth=(1280/(zoomValue));
+        yWidth=(480/(zoomValue));
     } else{
+
         return
     }
 
@@ -99,7 +126,7 @@ function dragZoom(diff){
 
     //setTimeout(wtf,10000);
     drawImg();
-    console.log("done");
+    //console.log("done");
 
 
 
@@ -107,9 +134,8 @@ function dragZoom(diff){
 
 }
 
-function wtf(){
-    alert("balls")
-}
+
+
 
 function mapRange(xTrue,yTrue){
     var relX=Math.round((parseInt(xTrue)/1280)*(img.zoomWidthX)+img.zoomMinX);
@@ -121,10 +147,12 @@ function mapRange(xTrue,yTrue){
 }
 canvas.addEventListener('mousedown', function(event) {
 
+
     if (event.button.toString()==="0"){
         leftMouseDown=true;
     }
     if (event.button.toString()==="2"){
+
         rightMouseDown=true;
     }
     event.preventDefault()
@@ -136,9 +164,19 @@ canvas.addEventListener('mousedown', function(event) {
 });
 canvas.addEventListener('contextmenu', event => event.preventDefault());
 canvas.addEventListener('mouseup', function(event) {
+
+
     leftMouseDown=false;
     rightMouseDown=false;
-    startZoom=[null, null];
+
+
+
+    indexPath=0;
+    lastZoomPos=startZoom;
+    if(zoomValue<1.2){
+        startZoom=[null, null];
+    }
+
     latestDrag=null;
     latestMove=[null, null];
     event.preventDefault()
@@ -147,6 +185,8 @@ canvas.addEventListener('mouseup', function(event) {
 canvas.addEventListener('mouseleave', function(event) {
     leftMouseDown=false;
     rightMouseDown=false;
+
+
     latestMove=[null, null];
     startZoom=[null, null];
     latestDrag=null;
@@ -157,31 +197,40 @@ canvas.addEventListener('mouseleave', function(event) {
 
 
 canvas.addEventListener('click', function(event) {
-    //mapRange(event.layerX,event.layerY)
-    //console.log(event);
-   //c.rect(event.layerX,event.layerY,150,100);
-   //c.stroke();
-   //drawImg()
+    if (currentTool==="select"){
+        console.log("add point dude");
+    }
+
+
 
 }, false);
 canvas.addEventListener('mousemove', function(event) {
 
-    if(leftMouseDown){
 
-        isBusy=true;
+    if(leftMouseDown && currentTool==="zoom"){
+
+
+
+
         if(startZoom[0]==null){
+
             posses=mapRange(event.layerX, event.layerY);
+
             startZoom=[posses[0],posses[1]];
 
         }
         if(latestDrag!=null){
             dragZoom(latestDrag-event.layerX);
         }
+        if(latestDrag-event.layerX>0){
+            lastZoomPos=startZoom;
+        }
 
         latestDrag=event.layerX;
     }
 
     if(rightMouseDown){
+
         if(latestMove[0]!=null){
             translate(event.layerX-latestMove[0],event.layerY-latestMove[1])
         }
@@ -226,6 +275,30 @@ function handleFileSelect(evt) {
     loadImage(1)
 
 }
+function handleVIPSelect(evt) {
+
+    console.log(evt)
+    file = evt.target.files;// FileList object
+
+    let reader3 = new FileReader();
+    reader3.onload = function() {
+        let contents = reader3.result;
+        let res = contents.split(".png");
+        res.splice(-1,1)
+        for (index in res){
+            hashindex=res[index].indexOf("#")
+            res[index]=parseInt(res[index].substr(hashindex+1));
+        }
+        textVIP=res;
+        alertMessage("n00t säger:", "Fann "+textVIP.length+" bilder att annotera.", "positive");
+
+    };
+
+    reader3.readAsText(file[0]);
+
+
+
+}
 
 function resetToolBtns(){
     resetList =document.querySelectorAll('#toolActive a i');
@@ -234,10 +307,15 @@ function resetToolBtns(){
 
 function toolSelected(){
     resetToolBtns()
-    this.querySelector('i').style.color="blue";
+
+    currentToolIcon=this.querySelector('i');
+    idString=currentToolIcon.id;
+    currentTool=idString.substring(0,idString.length-4);
+    this.querySelector('i').style.color="Aqua";
 }
 
 document.getElementById('fileLoad').addEventListener('change', handleFileSelect, false);
+document.getElementById('vipLoad').addEventListener('change', handleVIPSelect, false);
 var toolUsedBtns =document.querySelectorAll('#toolActive a');
 for(var i=0, len=toolUsedBtns.length; i < len; i++){toolUsedBtns[i].addEventListener('click', toolSelected)};
 
