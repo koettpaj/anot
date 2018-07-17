@@ -1,6 +1,6 @@
 const canvas = document.querySelector('canvas');
 const zoom = document.getElementById('zoom');
-
+$("#messageBox").hide();
 const slider =document.getElementById('myRange');
 let zoomValue=1;
 
@@ -9,9 +9,9 @@ const zoomIcon =document.getElementById('zoomIcon');
 const moveIcon =document.getElementById('moveIcon');
 const selectIcon =document.getElementById('selectIcon');
 
-
+const vipLoad = document.getElementById('vipLoad');
 //canvas.addEventListener("wheel", wheelZoom);
-
+let imageIndex=0;
 let leftMouseDown=false;
 let  rightMouseDown=false;
 let  latestMove=[null, null];
@@ -29,7 +29,7 @@ const loadText = document.getElementById("loadText")
 const messageBox = document.getElementById("messageBox");
 const messageHeader = document.getElementById("messageHeader");
 const messageP = document.getElementById("messageP");
-
+let numWorkers=0;
 
 function translate(xdiff,ydiff){
 
@@ -66,7 +66,23 @@ function translate(xdiff,ydiff){
 
 
 }
+function prevVIP(index){
+    if(textVIP.indexOf(index) >-1){
+        sliderChange(index);
+        return
+    }
+    prevVIP(index-1);
+}
 
+
+function nextVIP(index){
+    if(textVIP.indexOf(index) >-1){
+        sliderChange(index);
+        return
+    }
+    nextVIP(index+1);
+
+}
 function dragZoom(diff){
     //console.log(diff);
 
@@ -241,6 +257,17 @@ canvas.addEventListener('mousemove', function(event) {
 
 });
 
+document.addEventListener('keydown', function(event) {
+    const key = event.key; // "a", "1", "Shift", etc.
+    let index=imageIndex
+    if(key==="a"){
+        prevVIP(index)
+    }
+    else if(key==="d"){
+        nextVIP(index)
+    }
+});
+
 
 const c = canvas.getContext('2d');
 c.imageSmoothingEnabled = false;
@@ -276,7 +303,6 @@ function handleFileSelect(evt) {
 
 }
 function handleVIPSelect(evt) {
-
     console.log(evt)
     file = evt.target.files;// FileList object
 
@@ -290,8 +316,8 @@ function handleVIPSelect(evt) {
             res[index]=parseInt(res[index].substr(hashindex+1));
         }
         textVIP=res;
-        alertMessage("n00t säger:", "Fann "+textVIP.length+" bilder att annotera.", "positive");
-
+        alertMessage("n00t säger:", "Hittade "+textVIP.length+" bilder att annotera.", "positive",5000);
+        vipLoad.value="";
     };
 
     reader3.readAsText(file[0]);

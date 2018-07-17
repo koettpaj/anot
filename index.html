@@ -111,15 +111,27 @@
             outline: none !important;
         }
 
-
+        #messageBox{
+            position:absolute;
+            z-index:10;
+        }
 
 
 
 
     </style>
     <script src="controllers.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></script>
 </head>
 <body>
+<div id="messageBox" class="ui message">
+    <div id="messageHeader" class="header">
+
+    </div>
+    <p id="messageP"></p>
+</div>
+
     <div class="ui grid">
         <div class ="row" id="header">
             <div class="three wide column">
@@ -146,6 +158,10 @@
         </div>
 
         <div class="row" id="canvasRow">
+            <div class="ui dimmer" id="loadCircle">
+                <div class="ui text loader" id="loadText">Loading</div>
+            </div>
+
                 <div class="two wide column">
 
                     <div class="ui two column grid" id="buttonIcons">
@@ -168,6 +184,18 @@
                                 <i class="images outline icon"></i>
                                 Exportera
                             </a>
+                            <label for="vipLoad">
+                            <a class="item">
+
+                                <i class="file alternate outline icon"></i>
+                                VIP
+                                <input name="vip" type="file" id="vipLoad" style="display:none" />
+
+                            </a>
+                            </label>
+
+
+
                         </div>
 
                         </div>
@@ -188,10 +216,12 @@
                 <div class="twelve wide column">
                      <div class="ui container" id="divcanvas">
 
-                        <canvas></canvas>
+                        <canvas id="canvas" style="z-index:0"></canvas>
 
                     </div>
+
                 </div>
+
             <div class="two wide column"></div>
 
 
@@ -205,14 +235,18 @@
                 </div>
             </div>
         </div>
-        <div class="row" id="rest"></div>
+        <div class="row" id="rest">
+
+        </div>
 
     </div>
 
-    <output id="list"></output>
+
+
 
     <sript src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></sript>
     <script>var files;</script>
+    <script>//var vip;</script>
     <script src="canvas.js"></script>
 </body>
 </html>
