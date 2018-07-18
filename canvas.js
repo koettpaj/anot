@@ -67,22 +67,34 @@ function translate(xdiff,ydiff){
 
 }
 function prevVIP(index){
-    if(textVIP.indexOf(index) >-1){
-        sliderChange(index);
-        return
+    for (i = index; i >= 0; i--) {
+
+        if(index>textVIP[i]){
+
+            slider.value=textVIP[i];
+            sliderChange(textVIP[i]);
+            return;
+        }
     }
-    prevVIP(index-1);
 }
 
 
 function nextVIP(index){
-    if(textVIP.indexOf(index) >-1){
-        sliderChange(index);
-        return
+    for (i = 0; i < textVIP.length; i++) {
+
+        if(index<textVIP[i]){
+
+            slider.value=textVIP[i];
+            sliderChange(textVIP[i]);
+            return;
+        }
     }
-    nextVIP(index+1);
+
+
 
 }
+
+
 function dragZoom(diff){
     //console.log(diff);
 
@@ -214,7 +226,7 @@ canvas.addEventListener('mouseleave', function(event) {
 
 canvas.addEventListener('click', function(event) {
     if (currentTool==="select"){
-        console.log("add point dude");
+        draw(event);
     }
 
 
@@ -259,7 +271,7 @@ canvas.addEventListener('mousemove', function(event) {
 
 document.addEventListener('keydown', function(event) {
     const key = event.key; // "a", "1", "Shift", etc.
-    let index=imageIndex
+    let index=imageIndex;
     if(key==="a"){
         prevVIP(index)
     }

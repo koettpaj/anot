@@ -3,7 +3,7 @@ function sliderChange(value){
 }
 
 function loadImage(index){
-    console.log("LOAAADING");
+
     reader.readAsDataURL(files[index-1]);
     imageIndex=index;
 
