@@ -1,5 +1,7 @@
 function sliderChange(value){
-    loadImage(value)
+
+    loadImage(value);
+    updateWholeTable();
 }
 
 function loadImage(index){
@@ -95,6 +97,9 @@ function drawMarking(){
     console.log("total: "+drawingList[imageIndex].length);
     let i;
     for(i=0;i<drawingList[imageIndex].length; i++){
+        if(drawingList[imageIndex][i]==null){
+            continue;
+        }
         console.log("now at:" +i);
         c.beginPath();
         c.lineWidth=1/zoomValue;

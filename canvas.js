@@ -39,6 +39,8 @@ let prevColor=null;
 let colorSelectedStr=null;
 let latestEvent=null;
 let isDrawing=false;
+const layerList=document.getElementById("layerList");
+const tbody=document.getElementById("tbodyInsert");
 
 function translate(xdiff,ydiff){
 
@@ -268,23 +270,85 @@ function toolSelected(){
     this.querySelector('i').style.color="Aqua";
 }
 
+function updateWholeTable(){
+    tbody.innerHTML="";
+    if(drawingList[imageIndex]==null){
+        return;
+    }
+    for(let i=0;i<drawingList[imageIndex].length; i++){
+        updateTable(drawingList[imageIndex][i])
+    }
+}
 
-function newPath(event){
+function removePath(index){
+    if(drawingList[imageIndex].length===1){
+        drawingList[imageIndex]=null;
+    }
+    else{drawingList[imageIndex].splice(index, 1);}
+    updateWholeTable();
+    console.log(index);
+    drawImg();
+    drawMarking();
+}
+
+function updateTable(obj){
+    console.log("Updating: "+obj);
+
+    let name = document.createElement("td");
+    name.innerText=obj.name;
+    let type = document.createElement("td");
+
+    let image = document.createElement("i");
+    image.className=obj.logo
+
+    let edit = document.createElement("td");
+    edit.className="center aligned selectable";
+    edit.innerHTML="<i class='edit icon'></i>";
+
+    let deleteSpace = document.createElement("td");
+    deleteSpace.className="center aligned selectable";
+    let deleteimage = document.createElement("i");
+    deleteimage.className="trash alternate icon";
+    deleteSpace.addEventListener('click', function(){
+        removePath(obj.index)
+    });
+
+    let tr = document.createElement("tr");
+
+
+
+    type.appendChild(image);
+    deleteSpace.appendChild(deleteimage);
+
+    tr.appendChild(name);
+    tr.appendChild(type);
+    tr.appendChild(edit);
+    tr.appendChild(deleteSpace);
+    tbody.appendChild(tr);
+}
+
+function newPath(event, logo){
+
     isDrawing=true;
     let selectObj = Object();
     selectObj.finished=false;
     selectObj.color=colorSelectedStr;
     selectObj.coordinates=[];
-
+    selectObj.logo=logo;
+    selectObj.index=0;
+    selectObj.arrindex=drawingList[imageIndex].length;
+    selectObj.name=drawingList[imageIndex].length;
     let posses = mapRange(event.layerX, event.layerY);
 
     selectObj.coordinates.push(posses);
+    updateTable(selectObj);
     drawingList[imageIndex].push(selectObj);
     console.log("color:"+selectObj.color);
 }
 
 function finishPath(){
     isDrawing=false;
+
     drawingList[imageIndex][drawingList[imageIndex].length-1].finished=true;
 }
 
@@ -330,7 +394,7 @@ function colorSelectedFinal(){
 
 
     currentColorIcon=this.querySelector('i');
-
+    icon = currentColorIcon.getAttribute("data-class");
     color = currentColorIcon.getAttribute("data-color");
     colorSelectedStr=color;
 
@@ -339,7 +403,7 @@ function colorSelectedFinal(){
     ;
    $('#messageBoxInput').transition('fade')
    ;
-    newPath(latestEvent);
+    newPath(latestEvent, icon);
 
 }
 
