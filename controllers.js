@@ -76,7 +76,6 @@ function drawImg(){
     canvas.width = img.width;
     canvas.height = img.height;
     c.imageSmoothingEnabled = false;
-    c.imageSmoothingEnabled = false;
     //c.scale(zoomValue, zoomValue)
     //c.drawImage(img,0,0,1282,482);
 
@@ -87,6 +86,22 @@ function drawImg(){
     //c.drawImage(img, img.width / zoom, img.height / zoom, img.width / zoom, img.height / zoom, 0, 0, canvas.width, canvas.height);
 
 }
+
+function drawMarking(){
+    if(drawingList[imageIndex]==null){
+        return
+    }
+    if(drawingList[imageIndex].length>1){
+        c.beginPath();
+        c.lineWidth=1/zoomValue;
+        c.setTransform(zoomValue,0,0, zoomValue,-img.zoomMinX*zoomValue,-img.zoomMinY*zoomValue);
+        c.moveTo(drawingList[imageIndex][0][0], drawingList[imageIndex][0][1]);
+        for (i = 1; i <drawingList[imageIndex].length; i++) {
+            c.lineTo(drawingList[imageIndex][i][0], drawingList[imageIndex][i][1]);
+            c.stroke();
+        }}
+}
+
 
 
 function alertMessage(header,msg, type, duration){
