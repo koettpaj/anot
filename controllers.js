@@ -91,15 +91,34 @@ function drawMarking(){
     if(drawingList[imageIndex]==null){
         return
     }
-    if(drawingList[imageIndex].length>1){
+
+    console.log("total: "+drawingList[imageIndex].length);
+    let i;
+    for(i=0;i<drawingList[imageIndex].length; i++){
+        console.log("now at:" +i);
         c.beginPath();
         c.lineWidth=1/zoomValue;
+        c.strokeStyle=drawingList[imageIndex][i].color;
         c.setTransform(zoomValue,0,0, zoomValue,-img.zoomMinX*zoomValue,-img.zoomMinY*zoomValue);
-        c.moveTo(drawingList[imageIndex][0][0], drawingList[imageIndex][0][1]);
-        for (i = 1; i <drawingList[imageIndex].length; i++) {
-            c.lineTo(drawingList[imageIndex][i][0], drawingList[imageIndex][i][1]);
+        let coordinateList=drawingList[imageIndex][i].coordinates;
+        c.moveTo(coordinateList[0][0], coordinateList[0][1]);
+        for (y = 1; y <coordinateList.length; y++) {
+            c.lineTo(coordinateList[y][0], coordinateList[y][1]);
+
             c.stroke();
-        }}
+        }
+        if(drawingList[imageIndex][i].finished){
+            //c.closePath();
+            c.fillStyle=drawingList[imageIndex][i].color;
+            c.fill();
+        }
+
+
+
+
+    }
+
+
 }
 
 
@@ -117,6 +136,25 @@ function alertMessage(header,msg, type, duration){
     $('#messageBox')
         .transition('slide right').transition({animation:'slide right',interval:duration,onComplete:function() {$('#messageBox').hide()}})
     ;
+
+
+
+}
+
+function alertMessageInput(event){
+    console.log(event);
+
+
+
+    messageBoxInput.style.top=event.y+"px";
+    messageBoxInput.style.left=event.x+"px";
+
+    //messageHeader.innerHTML=header;
+    //messageP.innerHTML=msg;
+    $('#messageBoxInput')
+        .transition('slide right')
+    ;
+
 
 
 

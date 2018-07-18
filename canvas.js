@@ -1,6 +1,8 @@
 const canvas = document.querySelector('canvas');
 const zoom = document.getElementById('zoom');
 $("#messageBox").hide();
+$("#messageBoxInput").hide();
+
 const slider =document.getElementById('myRange');
 let zoomValue=1;
 
@@ -29,8 +31,14 @@ const loadText = document.getElementById("loadText")
 const messageBox = document.getElementById("messageBox");
 const messageHeader = document.getElementById("messageHeader");
 const messageP = document.getElementById("messageP");
+const messageBoxInput = document.getElementById("messageBoxInput");
 let drawingList=[];
 let numWorkers=0;
+let currentColor=null;
+let prevColor=null;
+let colorSelectedStr=null;
+let latestEvent=null;
+let isDrawing=false;
 
 function translate(xdiff,ydiff){
 
@@ -260,14 +268,78 @@ function toolSelected(){
     this.querySelector('i').style.color="Aqua";
 }
 
-function draw(event){
-    if(drawingList[imageIndex]==null){
-        drawingList[imageIndex]=[]
-    }
+
+function newPath(event){
+    isDrawing=true;
+    let selectObj = Object();
+    selectObj.finished=false;
+    selectObj.color=colorSelectedStr;
+    selectObj.coordinates=[];
+
     let posses = mapRange(event.layerX, event.layerY);
 
-    drawingList[imageIndex].push(posses);
-    drawMarking();
+    selectObj.coordinates.push(posses);
+    drawingList[imageIndex].push(selectObj);
+    console.log("color:"+selectObj.color);
+}
+
+function finishPath(){
+    isDrawing=false;
+    drawingList[imageIndex][drawingList[imageIndex].length-1].finished=true;
+}
+
+function draw(event){
+    if(drawingList[imageIndex]==null){
+        latestEvent=event;
+        alertMessageInput(event)
+        drawingList[imageIndex]= [];
+
+    }
+
+    else if(drawingList[imageIndex][drawingList[imageIndex].length-1].finished){
+        latestEvent=event;
+        alertMessageInput(event);
+    }
+
+
+    else{
+
+    let posses = mapRange(event.layerX, event.layerY);
+
+    drawingList[imageIndex][drawingList[imageIndex].length-1].coordinates.push(posses);
+    drawMarking();}
+
+}
+
+function colorSelected(){
+    if(currentColor!==null){
+        prevColor=currentColor;
+        prevColor.style.color="white";
+    }
+
+
+
+    currentColorIcon=this.querySelector('i');
+    currentColor=currentColorIcon;
+    color = currentColorIcon.getAttribute("data-color");
+    currentColorIcon.style.color=color;
+
+}
+
+function colorSelectedFinal(){
+
+
+    currentColorIcon=this.querySelector('i');
+
+    color = currentColorIcon.getAttribute("data-color");
+    colorSelectedStr=color;
+
+    $(currentColorIcon)
+        .transition('jiggle')
+    ;
+   $('#messageBoxInput').transition('fade')
+   ;
+    newPath(latestEvent);
 
 }
 
