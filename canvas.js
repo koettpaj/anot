@@ -4,7 +4,7 @@ $("#messageBox").hide();
 $("#messageBoxInput").hide();
 
 const slider =document.getElementById('myRange');
-let zoomValue=1;
+let zoomValue=1.25;
 
 
 const zoomIcon =document.getElementById('zoomIcon');
@@ -39,6 +39,10 @@ let prevColor=null;
 let colorSelectedStr=null;
 let latestEvent=null;
 let isDrawing=false;
+let canvasSizeX=1600;
+let canvasSizeY=600;
+let fakeCanvasSizeX=1280;
+let fakeCanvasSizeY=480;
 
 function translate(xdiff,ydiff){
 
@@ -112,8 +116,8 @@ function dragZoom(diff){
     console.log("ZOOMING");
     let xMin=0;
     let yMin=0;
-    let xWidth=1280;
-    let yWidth=480;
+    let xWidth=canvasSizeX;
+    let yWidth=canvasSizeY;
 
     if(diff<0 &&zoomValue<8){
         let x=startZoom[0]
@@ -122,23 +126,23 @@ function dragZoom(diff){
         if(zoomValue>8){
             zoomValue=8;
         }
-        xMin=(((x)-(1280/(zoomValue*2))));
-        yMin=(y-(480/(zoomValue*2)));
-        xWidth=(1280/(zoomValue));
-        yWidth=(480/(zoomValue));}
-    else if(diff>0 &&zoomValue>1){
+        xMin=(((x)-(canvasSizeX/(zoomValue*2))));
+        yMin=(y-(canvasSizeY/(zoomValue*2)));
+        xWidth=(canvasSizeX/(zoomValue));
+        yWidth=(canvasSizeY/(zoomValue));}
+    else if(diff>0 &&zoomValue>1.25){
         let x=startZoom[0]
         let y=startZoom[1]
 
 
         zoomValue-=Math.abs(diff/200*zoomValue);
-        if(zoomValue<1){
-            zoomValue=1;
+        if(zoomValue<1.25){
+            zoomValue=1.25;
         }
-        xMin=(((x)-(1280/(zoomValue*2))));
-        yMin=(y-(480/(zoomValue*2)));
-        xWidth=(1280/(zoomValue));
-        yWidth=(480/(zoomValue));
+        xMin=(((x)-(canvasSizeX/(zoomValue*2))));
+        yMin=(y-(canvasSizeY/(zoomValue*2)));
+        xWidth=(canvasSizeX/(zoomValue));
+        yWidth=(canvasSizeY/(zoomValue));
     } else{
 
         return
@@ -150,6 +154,7 @@ function dragZoom(diff){
     if(yMin<0){
         yMin=0;
     }
+
     if(xMin+xWidth>1280){
         xMin=1280-xWidth;
     }
@@ -177,8 +182,8 @@ function dragZoom(diff){
 
 
 function mapRange(xTrue,yTrue){
-    var relX=Math.round((parseInt(xTrue)/1280)*(img.zoomWidthX)+img.zoomMinX);
-    var relY=Math.round((parseInt(yTrue)/480)*(img.zoomWidthY)+img.zoomMinY);
+    var relX=Math.round((parseInt(xTrue)/1600)*(img.zoomWidthX)+img.zoomMinX);
+    var relY=Math.round((parseInt(yTrue)/600)*(img.zoomWidthY)+img.zoomMinY);
     console.log(relX + "and "+relY);
     return [relX, relY];
 
@@ -186,8 +191,8 @@ function mapRange(xTrue,yTrue){
 }
 
 function mapRangeReverse(relX,relY){
-    var xTrue=(relX/(img.zoomWidthX+img.zoomMinX))*1280;
-    var yTrue=(relY/(img.zoomWidthY+img.zoomMinY))*480;
+    var xTrue=(relX/(img.zoomWidthX+img.zoomMinX))*canvasSizeX;
+    var yTrue=(relY/(img.zoomWidthY+img.zoomMinY))*canvasSizeY;
     console.log("true: "+xTrue + "and "+yTrue);
     return [xTrue, yTrue];
 

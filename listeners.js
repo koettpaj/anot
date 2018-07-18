@@ -15,7 +15,7 @@ canvas.addEventListener('mousedown', function(event) {
     //drawImg()
 
 });
-canvas.addEventListener('contextmenu', event => event.preventDefault());
+//canvas.addEventListener('contextmenu', event => event.preventDefault());
 canvas.addEventListener('mouseup', function(event) {
 
 
@@ -26,7 +26,7 @@ canvas.addEventListener('mouseup', function(event) {
 
     indexPath=0;
     lastZoomPos=startZoom;
-    if(zoomValue<1.2){
+    if(zoomValue<1.5){
         startZoom=[null, null];
     }
 
@@ -50,6 +50,7 @@ canvas.addEventListener('mouseleave', function(event) {
 
 
 canvas.addEventListener('click', function(event) {
+    console.log(event);
     if (currentTool==="select"){
         draw(event);
     }

@@ -42,8 +42,8 @@ function findVIP(index){
 
 function getData(tempImg,x,y, index){
 
-    let ypos= Math.floor(index/1280);
-    let xpos = index%1280
+    let ypos= Math.floor(index/canvasSizeX);
+    let xpos = index%canvasSizeX
     c.drawImage(tempImg,x,y,1,1,xpos,ypos,1,1);
     var imgd = c.getImageData(xpos,ypos, 1, 1);
     var pix = imgd.data;
@@ -73,14 +73,15 @@ function getData(tempImg,x,y, index){
 
 function drawImg(){
 
-    canvas.width = img.width;
-    canvas.height = img.height;
+    canvas.width = 1600;
+    canvas.height = 600;
     c.imageSmoothingEnabled = false;
+
     //c.scale(zoomValue, zoomValue)
     //c.drawImage(img,0,0,1282,482);
 
     //console.log("image dimensions: "+img.zoomMinX+" "+img.zoomMinY+" "+img.zoomWidthX+" "+img.zoomWidthY+" zv: "+zoomValue);
-    c.drawImage(img,img.zoomMinX,img.zoomMinY,img.zoomWidthX,img.zoomWidthY,0,0,1280,480);
+    c.drawImage(img,img.zoomMinX,img.zoomMinY,img.zoomWidthX,img.zoomWidthY,0,0,1600,600);
 
 
     //c.drawImage(img, img.width / zoom, img.height / zoom, img.width / zoom, img.height / zoom, 0, 0, canvas.width, canvas.height);
@@ -100,6 +101,7 @@ function drawMarking(){
         c.lineWidth=1/zoomValue;
         c.strokeStyle=drawingList[imageIndex][i].color;
         c.setTransform(zoomValue,0,0, zoomValue,-img.zoomMinX*zoomValue,-img.zoomMinY*zoomValue);
+
         let coordinateList=drawingList[imageIndex][i].coordinates;
         c.moveTo(coordinateList[0][0], coordinateList[0][1]);
         for (y = 1; y <coordinateList.length; y++) {
@@ -108,7 +110,7 @@ function drawMarking(){
             c.stroke();
         }
         if(drawingList[imageIndex][i].finished){
-            //c.closePath();
+            c.closePath();
             c.fillStyle=drawingList[imageIndex][i].color;
             c.fill();
         }
