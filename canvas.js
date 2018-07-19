@@ -41,7 +41,19 @@ let latestEvent=null;
 let isDrawing=false;
 const layerList=document.getElementById("layerList");
 const tbody=document.getElementById("tbodyInsert");
-
+const canvasFloat=document.getElementById("canvasFloat");
+let rect = canvas.getBoundingClientRect();
+canvasFloat.style.top=rect.top+"px";
+canvasFloat.style.left=rect.left+"px";
+canvas.style.cursor = "pointer";
+let boxBeingDragged=null;
+let zindex=15;
+$("#canvasFloat").hide();
+window.addEventListener('resize', function(){
+    let rect = canvas.getBoundingClientRect();
+    canvasFloat.style.top=rect.top+"px";
+    canvasFloat.style.left=rect.left+"px";
+}, true);
 function translate(xdiff,ydiff){
 
     xdiff=xdiff/zoomValue;
@@ -118,6 +130,7 @@ function dragZoom(diff){
     let yWidth=480;
 
     if(diff<0 &&zoomValue<8){
+        canvas.style.cursor = "zoom-in";
         let x=startZoom[0]
         let y=startZoom[1]
         zoomValue+=Math.abs(diff/200*zoomValue);
@@ -129,6 +142,7 @@ function dragZoom(diff){
         xWidth=(1280/(zoomValue));
         yWidth=(480/(zoomValue));}
     else if(diff>0 &&zoomValue>1){
+        canvas.style.cursor = "zoom-out";
         let x=startZoom[0]
         let y=startZoom[1]
 
@@ -228,6 +242,7 @@ function handleFileSelect(evt) {
     files = evt.target.files;// FileList object
     slider.setAttribute("max", files.length.toString())
     console.log(files);
+    alertMessage("n00t säger:","Laddade in "+files.length+" bilder.","positive","5000");
 
     loadImage(1)
 
@@ -267,6 +282,15 @@ function toolSelected(){
     currentToolIcon=this.querySelector('i');
     idString=currentToolIcon.id;
     currentTool=idString.substring(0,idString.length-4);
+    if(currentTool==="zoom"){
+        canvas.style.cursor = "zoom-in";
+    }
+    else if(currentTool==="move"){
+        canvas.style.cursor = "move";
+    }
+    else if(currentTool==="select"){
+        canvas.style.cursor = "initial";
+    }
     this.querySelector('i').style.color="Aqua";
 }
 
@@ -280,15 +304,26 @@ function updateWholeTable(){
     }
 }
 
-function removePath(index){
+function removePath(obj){
     if(drawingList[imageIndex].length===1){
         drawingList[imageIndex]=null;
     }
-    else{drawingList[imageIndex].splice(index, 1);}
+    else{
+        let removeindex=drawingList[imageIndex].indexOf(obj);
+        drawingList[imageIndex].splice(removeindex,1);
+    }
     updateWholeTable();
-    console.log(index);
+
     drawImg();
     drawMarking();
+}
+
+
+function alterPath(obj){
+    $("#canvasFloat").fadeIn();
+    obj.altering=true;
+    drawMarking();
+
 }
 
 function updateTable(obj){
@@ -310,8 +345,13 @@ function updateTable(obj){
     let deleteimage = document.createElement("i");
     deleteimage.className="trash alternate icon";
     deleteSpace.addEventListener('click', function(){
-        removePath(obj.index)
+        removePath(obj)
     });
+
+    edit.addEventListener('click',function(){
+        alterPath(obj)
+    });
+
 
     let tr = document.createElement("tr");
 
@@ -327,6 +367,8 @@ function updateTable(obj){
     tbody.appendChild(tr);
 }
 
+
+
 function newPath(event, logo){
 
     isDrawing=true;
@@ -334,13 +376,16 @@ function newPath(event, logo){
     selectObj.finished=false;
     selectObj.color=colorSelectedStr;
     selectObj.coordinates=[];
+    selectObj.coordinates[0]=[];
+    selectObj.coordinates[1]=[];
     selectObj.logo=logo;
     selectObj.index=0;
     selectObj.arrindex=drawingList[imageIndex].length;
     selectObj.name=drawingList[imageIndex].length;
+    selectObj.altering=false;
     let posses = mapRange(event.layerX, event.layerY);
 
-    selectObj.coordinates.push(posses);
+    selectObj.coordinates[0].push(posses);
     updateTable(selectObj);
     drawingList[imageIndex].push(selectObj);
     console.log("color:"+selectObj.color);
@@ -370,7 +415,7 @@ function draw(event){
 
     let posses = mapRange(event.layerX, event.layerY);
 
-    drawingList[imageIndex][drawingList[imageIndex].length-1].coordinates.push(posses);
+    drawingList[imageIndex][drawingList[imageIndex].length-1].coordinates[0].push(posses);
     drawMarking();}
 
 }

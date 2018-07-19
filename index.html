@@ -132,6 +132,20 @@
             right:80px;
             width:125%;
         }
+        #canvasFloat{
+
+            position:absolute;
+            top:0px;
+            left:0px;
+            height: 480px;
+            width: 1280px;
+            padding: 0;
+            margin: 0;
+            z-index:10;
+            background-color: rgba(255, 0, 0, 0.3);
+
+            display:block;
+        }
 
 
 </style>
@@ -174,7 +188,7 @@
 
 
 
-    <div class="ui grid">
+    <div class="ui stackable grid">
         <div class ="row" id="header">
             <div class="three wide column">
 
@@ -260,6 +274,7 @@
 
                         <canvas id="canvas" style="z-index:0"></canvas>
 
+
                     </div>
 
                 </div>
@@ -297,7 +312,7 @@
 
     </div>
 
-
+    <div id="canvasFloat"></div>
 
 
     <sript src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></sript>
