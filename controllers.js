@@ -97,9 +97,9 @@ function drawMarking(){
     console.log("total: "+drawingList[imageIndex].length);
     let i;
     for(i=0;i<drawingList[imageIndex].length; i++){
-        if(drawingList[imageIndex][i].altering){
+       /* if(drawingList[imageIndex][i].altering){
             continue;
-        }
+        }*/
 
         c.beginPath();
         c.lineWidth=1/zoomValue;
@@ -151,7 +151,7 @@ function drawAlter(){
 
         //c.arc(coordinateList[0][0], coordinateList[0][1], 10/zoomValue, 0, 2*Math.PI);
         c.moveTo(coordinateList[0][0], coordinateList[0][1]);
-        for (y = 0; y <coordinateList.length; y++) {
+        for (y = 1; y <coordinateList.length; y++) {
             c.lineTo(coordinateList[y][0], coordinateList[y][1]);
             //c.fillRect(coordinateList[y][0]-(5/zoomValue), coordinateList[y][1]-(5/zoomValue),10/zoomValue,10/zoomValue);
 
@@ -169,6 +169,27 @@ function drawAlter(){
 
 }
 
+function drawObj(obj){
+    c.beginPath();
+    c.lineWidth=1/zoomValue;
+    c.strokeStyle="orange";
+    c.setTransform(zoomValue,0,0, zoomValue,-img.zoomMinX*zoomValue,-img.zoomMinY*zoomValue);
+    let coordinateList=obj.coordinates[0];
+    c.fillStyle="blue";
+    //c.fillRect(coordinateList[0][0]-5/zoomValue, coordinateList[0][1]-5/zoomValue, 10/zoomValue, 10/zoomValue);
+
+    //c.arc(coordinateList[0][0], coordinateList[0][1], 10/zoomValue, 0, 2*Math.PI);
+    c.moveTo(coordinateList[0][0], coordinateList[0][1]);
+    canvasFloat.innerHTML="";
+    for (y = 0; y <coordinateList.length; y++) {
+        c.lineTo(coordinateList[y][0], coordinateList[y][1]);
+        //c.fillRect(coordinateList[y][0]-(5/zoomValue), coordinateList[y][1]-(5/zoomValue),10/zoomValue,10/zoomValue);
+
+        //c.arc(coordinateList[y][0], coordinateList[y][1], 10/zoomValue, 0, 2*Math.PI);
+        let box = drawBox(coordinateList[y][0], coordinateList[y][1],y,i);
+       obj.coordinates[1].push(box);}
+}
+
 function dragStart(event,box){
 
     box.style.background="red";
@@ -179,15 +200,21 @@ function dragStart(event,box){
 
 }
 function dragOver(e) {
+
     if (e.preventDefault) {
         e.preventDefault(); // Necessary. Allows us to drop.
     }
     let index= drawingList[imageIndex][0].coordinates[1].indexOf(boxBeingDragged);
-    let posses = mapRange(e.layerX, e.layerY);
-    drawingList[imageIndex][0].coordinates[0][index]=posses;
-    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
     console.log(e);
+    let posses = mapRange(e.layerX, e.layerY);
 
+    console.log(posses);
+    drawingList[imageIndex][0].coordinates[0][index]=[posses[0],posses[1]];
+    //drawMarking();
+    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    //console.log(e);
+    drawImg();
+    drawMarking();
     return false;
 }
 
@@ -198,6 +225,7 @@ function drop(e, box, boxIndex, pathIndex){
 }
 
 function drawBox(relX,relY, boxIndex, pathIndex){
+
     let box= document.createElement("div");
     box.style.position="inherit";
     box.style.width="10px";
