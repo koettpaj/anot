@@ -97,9 +97,9 @@ function drawMarking(){
     console.log("total: "+drawingList[imageIndex].length);
     let i;
     for(i=0;i<drawingList[imageIndex].length; i++){
-       /* if(drawingList[imageIndex][i].altering){
+        if(drawingList[imageIndex][i].altering){
             continue;
-        }*/
+        }
 
         c.beginPath();
         c.lineWidth=1/zoomValue;
@@ -128,7 +128,7 @@ function drawMarking(){
 }
 
 function drawAlter(){
-    canvasFloat.innerHTML="";
+
     if(drawingList[imageIndex]==null){
         return
     };
@@ -152,13 +152,18 @@ function drawAlter(){
         //c.arc(coordinateList[0][0], coordinateList[0][1], 10/zoomValue, 0, 2*Math.PI);
         c.moveTo(coordinateList[0][0], coordinateList[0][1]);
         for (y = 1; y <coordinateList.length; y++) {
+            console.log("DRAWING SDHT");
             c.lineTo(coordinateList[y][0], coordinateList[y][1]);
+
+
             //c.fillRect(coordinateList[y][0]-(5/zoomValue), coordinateList[y][1]-(5/zoomValue),10/zoomValue,10/zoomValue);
 
             //c.arc(coordinateList[y][0], coordinateList[y][1], 10/zoomValue, 0, 2*Math.PI);
-            let box = drawBox(coordinateList[y][0], coordinateList[y][1],y,i);
-            drawingList[imageIndex][i].coordinates[1].push(box);
+            //let box = drawBox(coordinateList[y][0], coordinateList[y][1],y,i);
+            //drawingList[imageIndex][i].coordinates[1].push(box);
         }
+        c.closePath();
+        c.stroke();
 
 
 
@@ -166,7 +171,19 @@ function drawAlter(){
 
     }
 
+}
 
+function createBoxes(){
+    for(i=0;i<drawingList[imageIndex].length; i++){
+
+        let coordinateList=drawingList[imageIndex][i].coordinates[0];
+        for (y = 0; y <coordinateList.length; y++) {
+
+
+            let box = createBox(coordinateList[y][0], coordinateList[y][1],y,i);
+            drawingList[imageIndex][i].coordinates[1].push(box);
+        }
+    }
 }
 
 function drawObj(obj){
@@ -224,7 +241,7 @@ function drop(e, box, boxIndex, pathIndex){
     boxBeingDragged.style.left=e.layerX+"px";
 }
 
-function drawBox(relX,relY, boxIndex, pathIndex){
+function createBox(relX,relY, boxIndex, pathIndex){
 
     let box= document.createElement("div");
     box.style.position="inherit";

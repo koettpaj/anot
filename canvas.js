@@ -48,17 +48,21 @@ canvasFloat.style.left=rect.left+"px";
 canvas.style.cursor = "pointer";
 let boxBeingDragged=null;
 let zindex=15;
+
 $("#canvasFloat").hide();
 window.addEventListener('resize', function(){
     let rect = canvas.getBoundingClientRect();
     canvasFloat.style.top=rect.top+"px";
     canvasFloat.style.left=rect.left+"px";
 }, true);
-function translate(xdiff,ydiff){
+function translate(xdiff,ydiff, callback=null){
 
+    if(zoomValue<1.1){
+        return;
+    }
     xdiff=xdiff/zoomValue;
     ydiff=ydiff/zoomValue;
-    console.log("xdiff: "+typeof xdiff+" ydiff: "+ydiff);
+    console.log("xdiff: "+ xdiff+" ydiff: "+ydiff);
 
     let xMinTemp=img.zoomMinX;
     let yMinTemp=img.zoomMinY;
@@ -69,23 +73,26 @@ function translate(xdiff,ydiff){
     startZoom=[xMinTemp+widthXTemp/2 ,yMinTemp+widthYTemp/2];
 
 
-    if(xMinTemp<0){
-        xMinTemp=0;
+    if(xMinTemp<-50){
+        xMinTemp=-50;
     }
-    if(yMinTemp<0){
-        yMinTemp=0;
+    if(yMinTemp<-50){
+        yMinTemp=-50;
     }
-    if(xMinTemp+widthXTemp>1280){
-        xMinTemp=1280-widthXTemp;
+    if(xMinTemp+widthXTemp>1480){
+        xMinTemp=1480-widthXTemp;
     }
-    if(yMinTemp+widthYTemp>480){
-        yMinTemp=480-widthYTemp;
+    if(yMinTemp+widthYTemp>580){
+        yMinTemp=580-widthYTemp;
     }
 
     img.zoomMinX= xMinTemp;
     img.zoomMinY= yMinTemp;
     drawImg()
     drawMarking();
+    if(callback!==null){
+        callback();
+    }
 
 
 
@@ -118,12 +125,58 @@ function nextVIP(index){
 
 }
 
+function centerImage(xdiff,ydiff){
+
+
+    let interval=setInterval(function(){
+        if(img.zoomMinX<1 ||  img.zoomWidthX+img.zoomMinX>1280){
+            translate(xdiff,0);
+
+        }
+        if(img.zoomMinY<1 || img.zoomWidthY+img.zoomMinY>480){
+            translate(0,ydiff);
+        }
+
+        else{
+        clearInterval(interval)}
+    },20);
+
+
+
+
+
+
+}
+
+
 
 function dragZoom(diff){
     //console.log(diff);
 
+    let xdiff=0;
+    let ydiff=0;
 
-    console.log("ZOOMING");
+
+
+    if(img.zoomMinX<0){
+        xdiff=-10
+    }
+    if(img.zoomMinY<0){
+        ydiff=-5
+    }
+    if(img.zoomWidthX+img.zoomMinX>1280){
+        xdiff=10
+    }
+    if(img.zoomWidthY+img.zoomMinY>480){
+        ydiff=5
+    }
+
+    if(xdiff!==0 || ydiff!==0){
+        centerImage(xdiff,ydiff);
+        return;
+    }
+
+
     let xMin=0;
     let yMin=0;
     let xWidth=1280;
@@ -160,18 +213,23 @@ function dragZoom(diff){
         return
     }
 
-    if(xMin<0){
-        xMin=0;
-    }
-    if(yMin<0){
-        yMin=0;
-    }
-    if(xMin+xWidth>1280){
-        xMin=1280-xWidth;
-    }
-    if(yMin+yWidth>480){
-        yMin=480-yWidth;
-    }
+
+        if(xMin<0){
+            xMin=0;
+        }
+        if(yMin<0){
+            yMin=0;
+        }
+        if(xMin+xWidth>1280){
+            xMin=1280-xWidth;
+
+        }
+        if(yMin+yWidth>480){
+            yMin=480-yWidth;
+
+        }
+
+
 
     img.zoomMinX= xMin;
     img.zoomMinY= yMin;
@@ -201,11 +259,11 @@ function mapRange(xTrue,yTrue){
 
 }
 
-function mapRangeReverse(relX,relY){
-    var xTrue=(relX/(img.zoomWidthX+img.zoomMinX))*1280;
-    var yTrue=(relY/(img.zoomWidthY+img.zoomMinY))*480;
-    console.log("true: "+xTrue + "and "+yTrue);
-    return [xTrue, yTrue];
+function mapRangeFloat(xTrue,yTrue){
+    var relX=Math.round((parseInt(xTrue)/1480)*(img.zoomWidthX)+img.zoomMinX);
+    var relY=Math.round((parseInt(yTrue)/528)*(img.zoomWidthY)+img.zoomMinY);
+    console.log(relX + "and "+relY);
+    return [relX, relY];
 
 
 }
@@ -323,6 +381,7 @@ function alterPath(obj){
     $("#canvasFloat").fadeIn();
     obj.altering=true;
     drawMarking();
+    createBoxes();
 
 }
 
