@@ -48,6 +48,7 @@ canvasFloat.style.left=rect.left+"px";
 canvas.style.cursor = "pointer";
 let boxBeingDragged=null;
 let zindex=15;
+let objectBeingAltered=null;
 
 $("#canvasFloat").hide();
 window.addEventListener('resize', function(){
@@ -378,6 +379,7 @@ function removePath(obj){
 
 
 function alterPath(obj){
+    objectBeingAltered=obj;
     $("#canvasFloat").fadeIn();
     obj.altering=true;
     drawMarking();
@@ -508,6 +510,17 @@ function colorSelectedFinal(){
    $('#messageBoxInput').transition('fade')
    ;
     newPath(latestEvent, icon);
+
+}
+function removeCanvasFloat(){
+    clearBoxes(objectBeingAltered);
+    $("#canvasFloat").fadeOut();
+    canvasFloat.innerHTML="";
+
+    drawingList[imageIndex][objectBeingAltered].altering=false;
+    objectBeingAltered=null;
+    drawMarking();
+    createBoxes();
 
 }
 

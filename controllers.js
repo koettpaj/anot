@@ -173,7 +173,15 @@ function drawAlter(){
 
 }
 
+function clearBoxes(pathIndex){
+    console.log(pathIndex);
+    console.log(drawingList[imageIndex][pathIndex][1]);
+    drawingList[imageIndex][pathIndex][1]=[];
+    console.log(drawingList[imageIndex][pathIndex][1]);
+}
+
 function createBoxes(){
+    let i;
     for(i=0;i<drawingList[imageIndex].length; i++){
 
         let coordinateList=drawingList[imageIndex][i].coordinates[0];
@@ -207,8 +215,9 @@ function drawObj(obj){
        obj.coordinates[1].push(box);}
 }
 
-function dragStart(event,box){
-
+function dragStart(event,box, pathIndex){
+    console.log("PI= "+pathIndex);
+    objectBeingAltered=pathIndex;
     box.style.background="red";
     boxBeingDragged=box;
     //console.log("I AM BEING DRAGGED! "+box);
@@ -216,17 +225,17 @@ function dragStart(event,box){
     //box.style.top=event.y;
 
 }
-function dragOver(e) {
+function dragOver(e, box, pathIndex) {
 
     if (e.preventDefault) {
         e.preventDefault(); // Necessary. Allows us to drop.
     }
-    let index= drawingList[imageIndex][0].coordinates[1].indexOf(boxBeingDragged);
+    let index= drawingList[imageIndex][pathIndex].coordinates[1].indexOf(boxBeingDragged);
     console.log(e);
     let posses = mapRange(e.layerX, e.layerY);
 
     console.log(posses);
-    drawingList[imageIndex][0].coordinates[0][index]=[posses[0],posses[1]];
+    drawingList[imageIndex][pathIndex].coordinates[0][index]=[posses[0],posses[1]];
     //drawMarking();
     e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
     //console.log(e);
@@ -258,9 +267,11 @@ function createBox(relX,relY, boxIndex, pathIndex){
     box.style.borderRadius="50%";
 
     box.addEventListener("dragstart", function(e){
-        dragStart(e,box)
+        dragStart(e,box, pathIndex)
     });
-    canvasFloat.addEventListener("dragover", dragOver);
+    canvasFloat.addEventListener("dragover", function(e){
+        dragOver(e,box , pathIndex)
+    });
     canvasFloat.addEventListener("drop", function(e){
         drop(e, box,  boxIndex, pathIndex)
     });

@@ -133,6 +133,8 @@ document.addEventListener('keydown', function(event) {
 
 document.getElementById('fileLoad').addEventListener('change', handleFileSelect, false);
 document.getElementById('vipLoad').addEventListener('change', handleVIPSelect, false);
+document.getElementById('canvasFloat').addEventListener('click', removeCanvasFloat, false);
+document.getElementById('vipLoad').addEventListener('change', handleVIPSelect, false);
 var toolUsedBtns =document.querySelectorAll('#toolActive a');
 for(var i=0, len=toolUsedBtns.length; i < len; i++){toolUsedBtns[i].addEventListener('click', toolSelected)};
 var colorSelectDivs =document.querySelectorAll('#cardcontent td');
