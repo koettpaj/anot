@@ -100,6 +100,9 @@ function drawMarking(){
         if(drawingList[imageIndex][i].altering){
             continue;
         }
+        if(!drawingList[imageIndex][i].show){
+            continue;
+        }
 
         c.beginPath();
         c.lineWidth=1/zoomValue;
@@ -174,50 +177,29 @@ function drawAlter(){
 }
 
 function clearBoxes(pathIndex){
-    console.log(pathIndex);
-    console.log(drawingList[imageIndex][pathIndex][1]);
-    drawingList[imageIndex][pathIndex][1]=[];
-    console.log(drawingList[imageIndex][pathIndex][1]);
+
+
+
+    objectBeingAltered.coordinates[1]=[];
+
 }
 
 function createBoxes(){
-    let i;
-    for(i=0;i<drawingList[imageIndex].length; i++){
 
-        let coordinateList=drawingList[imageIndex][i].coordinates[0];
+
+
+        let coordinateList=objectBeingAltered.coordinates[0];
         for (y = 0; y <coordinateList.length; y++) {
 
-
-            let box = createBox(coordinateList[y][0], coordinateList[y][1],y,i);
-            drawingList[imageIndex][i].coordinates[1].push(box);
+            let box = createBox(coordinateList[y][0], coordinateList[y][1],y);
+            objectBeingAltered.coordinates[1].push(box);
         }
-    }
+
 }
 
-function drawObj(obj){
-    c.beginPath();
-    c.lineWidth=1/zoomValue;
-    c.strokeStyle="orange";
-    c.setTransform(zoomValue,0,0, zoomValue,-img.zoomMinX*zoomValue,-img.zoomMinY*zoomValue);
-    let coordinateList=obj.coordinates[0];
-    c.fillStyle="blue";
-    //c.fillRect(coordinateList[0][0]-5/zoomValue, coordinateList[0][1]-5/zoomValue, 10/zoomValue, 10/zoomValue);
+function dragStart(event,box){
 
-    //c.arc(coordinateList[0][0], coordinateList[0][1], 10/zoomValue, 0, 2*Math.PI);
-    c.moveTo(coordinateList[0][0], coordinateList[0][1]);
-    canvasFloat.innerHTML="";
-    for (y = 0; y <coordinateList.length; y++) {
-        c.lineTo(coordinateList[y][0], coordinateList[y][1]);
-        //c.fillRect(coordinateList[y][0]-(5/zoomValue), coordinateList[y][1]-(5/zoomValue),10/zoomValue,10/zoomValue);
 
-        //c.arc(coordinateList[y][0], coordinateList[y][1], 10/zoomValue, 0, 2*Math.PI);
-        let box = drawBox(coordinateList[y][0], coordinateList[y][1],y,i);
-       obj.coordinates[1].push(box);}
-}
-
-function dragStart(event,box, pathIndex){
-    console.log("PI= "+pathIndex);
-    objectBeingAltered=pathIndex;
     box.style.background="red";
     boxBeingDragged=box;
     //console.log("I AM BEING DRAGGED! "+box);
@@ -225,32 +207,40 @@ function dragStart(event,box, pathIndex){
     //box.style.top=event.y;
 
 }
-function dragOver(e, box, pathIndex) {
-
+function dragOver(e) {
     if (e.preventDefault) {
-        e.preventDefault(); // Necessary. Allows us to drop.
+        //  e.preventDefault(); // Necessary. Allows us to drop.
     }
-    let index= drawingList[imageIndex][pathIndex].coordinates[1].indexOf(boxBeingDragged);
-    console.log(e);
+    if(e.layerX<15 || e.layerY<15){
+        return
+    }
+    let index= objectBeingAltered.coordinates[1].indexOf(boxBeingDragged);
+    console.log(e)
     let posses = mapRange(e.layerX, e.layerY);
+    boxBeingDragged.style.top=e.layerY+"px";
+    boxBeingDragged.style.left=e.layerX+"px";
+
 
     console.log(posses);
-    drawingList[imageIndex][pathIndex].coordinates[0][index]=[posses[0],posses[1]];
+    objectBeingAltered.coordinates[0][index]=[posses[0],posses[1]];
     //drawMarking();
     e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
     //console.log(e);
     drawImg();
     drawMarking();
-    return false;
+
 }
 
 function drop(e, box, boxIndex, pathIndex){
     console.log(e);
     boxBeingDragged.style.top=e.layerY+"px";
     boxBeingDragged.style.left=e.layerX+"px";
+
 }
 
-function createBox(relX,relY, boxIndex, pathIndex){
+
+
+function createBox(relX,relY, boxIndex){
 
     let box= document.createElement("div");
     box.style.position="inherit";
@@ -267,13 +257,13 @@ function createBox(relX,relY, boxIndex, pathIndex){
     box.style.borderRadius="50%";
 
     box.addEventListener("dragstart", function(e){
-        dragStart(e,box, pathIndex)
+        dragStart(e,box)
     });
     canvasFloat.addEventListener("dragover", function(e){
-        dragOver(e,box , pathIndex)
+        dragOver(e)
     });
     canvasFloat.addEventListener("drop", function(e){
-        drop(e, box,  boxIndex, pathIndex)
+        drop(e)
     });
 
     zindex+=1;

@@ -49,6 +49,7 @@ canvas.style.cursor = "pointer";
 let boxBeingDragged=null;
 let zindex=15;
 let objectBeingAltered=null;
+let showAll=true;
 
 $("#canvasFloat").hide();
 window.addEventListener('resize', function(){
@@ -379,6 +380,7 @@ function removePath(obj){
 
 
 function alterPath(obj){
+    disableEdit();
     objectBeingAltered=obj;
     $("#canvasFloat").fadeIn();
     obj.altering=true;
@@ -391,7 +393,15 @@ function updateTable(obj){
     console.log("Updating: "+obj);
 
     let name = document.createElement("td");
-    name.innerText=obj.name;
+    let nameField = document.createElement("div");
+    nameField.className="ui inverted transparent input"
+    let inputF = document.createElement("input");
+    inputF.type="text"
+    inputF.placeholder=obj.name
+
+    inputF.addEventListener("blur", function(e){
+        obj.name=inputF.value;
+    });
     let type = document.createElement("td");
 
     let image = document.createElement("i");
@@ -410,22 +420,97 @@ function updateTable(obj){
     });
 
     edit.addEventListener('click',function(){
+        edit.className="center aligned";
         alterPath(obj)
     });
 
+    let view = document.createElement("td");
+
+    let checkBox=document.createElement("div");
+    checkBox.className="ui center aligned checked checkbox";
+
+    let inputBox= document.createElement("input");
+    inputBox.type="checkbox";
+    inputBox.checked=true;
+    checkBox.appendChild(inputBox);
+    let emptyLabel=document.createElement("label");
+    checkBox.appendChild(emptyLabel);
+    view.appendChild(checkBox);
+
+    checkBox.addEventListener("change", function(e){
+        obj.show=inputBox.checked;
+        drawImg();
+        drawMarking();
+
+    });
+
+
 
     let tr = document.createElement("tr");
-
-
+    nameField.appendChild(inputF);
+    name.appendChild(nameField);
 
     type.appendChild(image);
     deleteSpace.appendChild(deleteimage);
 
+
+    tr.appendChild(view);
     tr.appendChild(name);
     tr.appendChild(type);
     tr.appendChild(edit);
     tr.appendChild(deleteSpace);
+
     tbody.appendChild(tr);
+}
+
+function disableAll(){
+    $("#disableAllView")
+        .transition('stop all')
+    ;
+    let disableBtn = document.getElementById("disableAllView");
+    let viewButtons = document.querySelectorAll('#tbodyInsert .ui.center.aligned.checked.checkbox input');
+    for(let i=0, len=viewButtons.length; i < len; i++){viewButtons[i].click()}
+    console.log(disableBtn.className);
+
+    if(showAll){
+        showAll=false;
+        disableBtn.className="inverted eye slash icon"
+
+    }
+
+    else if(!showAll){
+        showAll=true;
+        disableBtn.className="inverted eye icon"
+
+    }
+
+
+}
+
+function wink(){
+
+    $("#disableAllView")
+        .transition('jiggle').transition('pulse')
+    ;
+}
+
+
+function disableEdit(){
+    let editButtons = document.querySelectorAll('#tbodyInsert tr td .edit.icon');
+    console.log(editButtons);
+    for(let i=0, len=editButtons.length; i < len; i++){editButtons[i].parentElement.className="center aligned"}
+
+    let editTable =document.getElementById("layerList");
+    editTable.className="ui inverted fixed table"
+
+}
+
+function enableEdit(){
+    let editButtons = document.querySelectorAll('#tbodyInsert tr td .edit.icon');
+    for(let i=0, len=editButtons.length; i < len; i++){editButtons[i].parentElement.className="center aligned selectable"}
+    let editTable =document.getElementById("layerList");
+    editTable.className="ui selectable inverted fixed table"
+
 }
 
 
@@ -444,6 +529,7 @@ function newPath(event, logo){
     selectObj.arrindex=drawingList[imageIndex].length;
     selectObj.name=drawingList[imageIndex].length;
     selectObj.altering=false;
+    selectObj.show=true;
     let posses = mapRange(event.layerX, event.layerY);
 
     selectObj.coordinates[0].push(posses);
@@ -513,14 +599,16 @@ function colorSelectedFinal(){
 
 }
 function removeCanvasFloat(){
+
     clearBoxes(objectBeingAltered);
     $("#canvasFloat").fadeOut();
     canvasFloat.innerHTML="";
 
-    drawingList[imageIndex][objectBeingAltered].altering=false;
+    objectBeingAltered.altering=false;
     objectBeingAltered=null;
     drawMarking();
-    createBoxes();
+    enableEdit();
+
 
 }
 

@@ -129,9 +129,7 @@
         margin: 0;
         }
         #layerList{
-            position:relative;
-            right:80px;
-            width:125%;
+
         }
         #canvasFloat{
 
@@ -149,7 +147,8 @@
         }
 
 
-</style>
+
+    </style>
     <script src="controllers.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></script>
@@ -288,19 +287,7 @@
                 </div>
 
             <div class="two wide column">
-                <table class="ui selectable inverted fixed table" id="layerList">
-                    <thead>
-                    <tr>
-                        <th>Namn</th>
-                        <th>Type</th>
-                        <th class="selectable"></th>
-                        <th class="selectable"></th>
-                    </tr>
-                    </thead>
-                    <tbody id="tbodyInsert">
 
-                    </tbody>
-                </table>
             </div>
 
 
@@ -322,6 +309,33 @@
 
     <div id="canvasFloat"></div>
 
+
+    <div class="ui grid">
+        <div class="row">
+        <div class="two wide column"></div>
+            <div class="twelve wide column">
+                <table class="ui selectable inverted fixed table" id="layerList">
+                <thead>
+                <tr>
+                    <th>
+
+                            <i class="inverted eye icon" onmouseover="wink()" onclick="disableAll()" id="disableAllView"> </i>
+
+
+                    </th>
+                    <th>Namn</th>
+                    <th>Typ</th>
+                    <th class="selectable"></th>
+                    <th class="selectable"></th>
+                </tr>
+                </thead>
+                <tbody id="tbodyInsert">
+
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
 
     <sript src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></sript>
     <script>var files;</script>
