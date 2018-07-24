@@ -120,6 +120,16 @@
             position:absolute;
             z-index:10;
         }
+        #messageBoxInputLayer{
+            position:absolute;
+            z-index:10;
+            width:200px;
+        }
+        #messageBoxInputLayerPaste{
+            position:absolute;
+            z-index:10;
+            width:200px;
+        }
         #cardcontent{
             background:#343434;
 
@@ -145,6 +155,9 @@
 
             display:block;
         }
+        #layerOptions{
+
+        }
 
 
 
@@ -161,7 +174,39 @@
     <p id="messageP"></p>
 </div>
 
-    <div class="ui raised card" id="messageBoxInput">
+    <div class="ui raised card" id="messageBoxInputLayer">
+        <div class="ui inverted segment" id="layerOptions">
+        <div class="ui inverted middle aligned selection list">
+            <div class="item" onclick="copyOne(event)" id="copyOne">
+                <div class="header" >Kopiera</div>
+            </div>
+            <div class="item" onclick="copyAll(event)">
+                <div class="header" >Kopiera till alla</div>
+            </div>
+
+        </div>
+
+
+        </div>
+    </div>
+    <div class="ui raised card" id="messageBoxInputLayerPaste">
+        <div class="ui inverted segment">
+            <div class="ui inverted middle aligned selection list">
+                <div class="item">
+                    <div class="header" onclick="paste(event,true)"  >Klistra in kopia</div>
+                </div>
+                <div class="item">
+                    <div class="header" onclick="paste(event,false)"  >Klistra in klon</div>
+                </div>
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+<div class="ui raised card" id="messageBoxInput">
         <div class="content" id="cardcontent" >
             <table class="ui center aligned inverted table">
 
@@ -239,7 +284,18 @@
 
                             </a>
                             </label>
-                            <a class="item">
+                            <label for="load">
+                                <a class="item">
+
+                                    <i class="upload icon"></i>
+                                    Öppna projekt
+                                    <input name="projectLoad" type="file" id="load" style="display:none" />
+
+                                </a>
+                            </label>
+
+
+                            <a class="item" id="save">
                                 <i class="save outline icon"></i>
                                 Spara
                             </a>
@@ -315,7 +371,7 @@
         <div class="two wide column"></div>
             <div class="twelve wide column">
                 <table class="ui selectable inverted fixed table" id="layerList">
-                <thead>
+                <thead id="thead">
                 <tr>
                     <th>
 

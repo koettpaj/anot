@@ -2,6 +2,8 @@ const canvas = document.querySelector('canvas');
 const zoom = document.getElementById('zoom');
 $("#messageBox").hide();
 $("#messageBoxInput").hide();
+$("#messageBoxInputLayer").hide();
+$("#messageBoxInputLayerPaste").hide();
 
 const slider =document.getElementById('myRange');
 let zoomValue=1;
@@ -32,6 +34,11 @@ const messageBox = document.getElementById("messageBox");
 const messageHeader = document.getElementById("messageHeader");
 const messageP = document.getElementById("messageP");
 const messageBoxInput = document.getElementById("messageBoxInput");
+const messageBoxInputLayer = document.getElementById("messageBoxInputLayer");
+const messageBoxInputLayerPaste = document.getElementById("messageBoxInputLayerPaste");
+const thead= document.getElementById("thead");
+const saveBtn= document.getElementById("save");
+
 let drawingList=[];
 let numWorkers=0;
 let currentColor=null;
@@ -39,6 +46,7 @@ let prevColor=null;
 let colorSelectedStr=null;
 let latestEvent=null;
 let isDrawing=false;
+let toCopy=null;
 const layerList=document.getElementById("layerList");
 const tbody=document.getElementById("tbodyInsert");
 const canvasFloat=document.getElementById("canvasFloat");
@@ -296,6 +304,20 @@ reader.onload = function (){
    // c.fillRect(20,20,150,100)
     //console.log(reader.result)
 };
+
+
+function handleProjectSelect(evt){
+    file = evt.target.files
+    let reader4 = new FileReader();
+    reader4.onload = function() {
+        let contents = reader4.result;
+        drawingList=JSON.parse(contents)
+        alertMessage("n00t säger:","Öppnade projekt!","positive",5000);
+    }
+
+    reader4.readAsText(file[0]);
+}
+
 function handleFileSelect(evt) {
     console.log("hello")
     console.log(evt)
@@ -449,7 +471,10 @@ function updateTable(obj){
     let tr = document.createElement("tr");
     nameField.appendChild(inputF);
     name.appendChild(nameField);
-
+    tr.addEventListener("contextmenu", function(e){
+        e.preventDefault();
+        layerOptions(e,this, obj)
+    })
     type.appendChild(image);
     deleteSpace.appendChild(deleteimage);
 
@@ -461,6 +486,13 @@ function updateTable(obj){
     tr.appendChild(deleteSpace);
 
     tbody.appendChild(tr);
+}
+
+function layerOptions(e, that, obj){
+
+    console.log(obj.name);
+    console.log(that);
+    alertMessageInputLayer(e, obj);
 }
 
 function disableAll(){
@@ -513,7 +545,9 @@ function enableEdit(){
 
 }
 
+function save(){
 
+}
 
 function newPath(event, logo){
 

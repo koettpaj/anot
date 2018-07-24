@@ -201,7 +201,10 @@ function dragStart(event,box){
 
 
     box.style.background="red";
-    boxBeingDragged=box;
+    let boxBeingDraggedLocal = Object();
+    boxBeingDraggedLocal.box=box;
+    boxBeingDraggedLocal.index= objectBeingAltered.coordinates[1].indexOf(boxBeingDraggedLocal.box);
+    boxBeingDragged=boxBeingDraggedLocal;
     //console.log("I AM BEING DRAGGED! "+box);
    // box.style.left=event.x;
     //box.style.top=event.y;
@@ -214,27 +217,31 @@ function dragOver(e) {
     if(e.layerX<15 || e.layerY<15){
         return
     }
-    let index= objectBeingAltered.coordinates[1].indexOf(boxBeingDragged);
+
     console.log(e)
     let posses = mapRange(e.layerX, e.layerY);
-    boxBeingDragged.style.top=e.layerY+"px";
-    boxBeingDragged.style.left=e.layerX+"px";
+    boxBeingDragged.box.style.top=e.layerY+"px";
+    boxBeingDragged.box.style.left=e.layerX+"px";
 
 
     console.log(posses);
-    objectBeingAltered.coordinates[0][index]=[posses[0],posses[1]];
+    objectBeingAltered.coordinates[0][boxBeingDragged.index]=[posses[0],posses[1]];
     //drawMarking();
     e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
     //console.log(e);
-    drawImg();
-    drawMarking();
+    if(objectBeingAltered.coordinates[0].length<10){
+        drawImg();
+        drawMarking();
+
+    }
+
 
 }
 
 function drop(e, box, boxIndex, pathIndex){
     console.log(e);
-    boxBeingDragged.style.top=e.layerY+"px";
-    boxBeingDragged.style.left=e.layerX+"px";
+    boxBeingDragged.box.style.top=e.layerY+"px";
+    boxBeingDragged.box.style.left=e.layerX+"px";
 
 }
 
@@ -305,8 +312,31 @@ function alertMessage(header,msg, type, duration){
 
 }
 
+function copyOne(e){
+    let obj = $('#messageBoxInputLayer').data("selected");
+    toCopy= obj;
+    $('#messageBoxInputLayer')
+        .transition('slide right')
+    ;
+
+}
+
+function copyAll(){
+    let obj = $('#messageBoxInputLayer').data("selected");
+    for(let i=0; i<files.length;i++){
+        if(drawingList[i]==null){
+            drawingList[i]=[]
+        }
+        drawingList[i].push(obj);
+    }
+    $('#messageBoxInputLayer')
+        .transition('slide right')
+    ;
+    alertMessage("n00t säger:","Kopierade masken till "+files.length+" bilder.","positive",5000);
+}
+
 function alertMessageInput(event){
-    console.log(event);
+
 
 
 
@@ -319,7 +349,54 @@ function alertMessageInput(event){
         .transition('slide right')
     ;
 
+}
+function alertMessageInputLayer(event, obj){
 
 
+
+
+    messageBoxInputLayer.style.top=event.y+"px";
+    messageBoxInputLayer.style.left=event.x+"px";
+    $('#messageBoxInputLayer').data("selected",obj);
+    //messageHeader.innerHTML=header;
+    //messageP.innerHTML=msg;
+    $('#messageBoxInputLayer')
+        .transition('slide right')
+    ;
 
 }
+function alertMessageInputLayerPaste(event){
+
+
+
+
+    messageBoxInputLayerPaste.style.top=event.y+"px";
+    messageBoxInputLayerPaste.style.left=event.x+"px";
+
+    //messageHeader.innerHTML=header;
+    //messageP.innerHTML=msg;
+    $('#messageBoxInputLayerPaste')
+        .transition('slide right')
+    ;
+
+}
+
+function paste(e,copy){
+    if(  drawingList[imageIndex]==null){
+        drawingList[imageIndex]=[];
+    }
+    let copyobj=toCopy
+    if(copy){
+
+        copyobj = jQuery.extend(true, {}, toCopy);
+    }
+
+    drawingList[imageIndex].push(copyobj);
+    $('#messageBoxInputLayerPaste')
+        .transition('slide right')
+    ;
+    drawImg();
+    drawMarking();
+    updateWholeTable();
+}
+

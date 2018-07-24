@@ -16,6 +16,14 @@ canvas.addEventListener('mousedown', function(event) {
 
 });
 canvas.addEventListener('contextmenu', event => event.preventDefault());
+
+
+thead.addEventListener('contextmenu', function(e){
+    e.preventDefault();
+    alertMessageInputLayerPaste(e);
+
+});
+
 canvas.addEventListener('mouseup', function(event) {
 
 
@@ -94,13 +102,24 @@ canvas.addEventListener('mousemove', function(event) {
     if(isDrawing && currentTool==="select"){
         drawImg();
         drawMarking();
-        let posses = mapRange(event.layerX, event.layerY)
-        c.lineTo(posses[0], posses[1]);
+        //let posses = mapRange(event.layerX, event.layerY)
+        c.setTransform(1, 0, 0, 1, 0, 0);
+        c.lineWidth=1;
+        c.lineTo(event.layerX, event.layerY);
         c.stroke();
     }
 
 
 });
+saveBtn.addEventListener("click", function(){
+    var dl = document.createElement('a');
+    dl.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(drawingList)));
+    dl.setAttribute('download', 'canvas_save.json');
+    dl.click();
+
+})
+
+
 
 document.addEventListener('keydown', function(event) {
     const key = event.key; // "a", "1", "Shift", etc.
@@ -133,6 +152,7 @@ document.addEventListener('keydown', function(event) {
 
 document.getElementById('fileLoad').addEventListener('change', handleFileSelect, false);
 document.getElementById('vipLoad').addEventListener('change', handleVIPSelect, false);
+document.getElementById('load').addEventListener('change', handleProjectSelect, false);
 document.getElementById('canvasFloat').addEventListener('click', removeCanvasFloat, false);
 var toolUsedBtns =document.querySelectorAll('#toolActive a');
 for(var i=0, len=toolUsedBtns.length; i < len; i++){toolUsedBtns[i].addEventListener('click', toolSelected)};
