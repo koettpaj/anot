@@ -73,8 +73,22 @@ function getData(tempImg,x,y, index){
 
 }
 
-function drawImg(){
+function zoomBoxToggle(e){
+        if(zoomBox){
+            zoomBox=false;
+            $("#zoomCanvas").hide();
+            zoomBoxa.className="item"
+        }
+        else{
+            zoomBox=true;
+            $("#zoomCanvas").show();
+            zoomBoxa.className="active item"
+        }
+        console.log(this);
 
+}
+
+function drawImg(){
     canvas.width = img.width;
     canvas.height = img.height;
     c.imageSmoothingEnabled = false;
@@ -89,6 +103,91 @@ function drawImg(){
 
 }
 
+function renderZoom(event){
+
+    let canvasPos = canvas.getBoundingClientRect();
+    zoomCanvas.style.top=event.layerY+canvasPos.top-64+"px";
+    zoomCanvas.style.left=event.layerX+canvasPos.left-64+"px";
+    let cSmall = zoomCanvas.getContext('2d');
+    let minX=event.layerX-16;
+    let minY=event.layerY-16;
+
+    cSmall.imageSmoothingEnabled = false;
+    cSmall.drawImage(canvas,minX,minY,32,32, 0, 0,128, 128);
+
+
+}
+function downloadImage()
+{
+    c.imageSmoothingEnabled = false;
+    let link = document.createElement('a');
+    link.setAttribute('download', 'MintyPaper.png');
+    link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+    link.click();
+}
+
+
+function exportImage(index){
+    zoomValue=1;
+    drawImg();
+    c.fillStyle = "#000000";
+    c.fillRect(0, 0, canvas.width, canvas.height);
+    let objIndex;
+    for(objIndex=0; objIndex<drawingList[index].length;objIndex++){
+        let imageData=removeAA(drawingList[index][objIndex].coordinates[0],drawingList[index][objIndex].color)
+    }
+
+}
+
+function removeAA(listpath, color){
+    drawSingleMark(listpath,color)
+    let colors=color.substring(5,color.length-1).split(",");
+    for(y=0;y<480;y++){
+        console.log("On line "+y);
+        for(x=0;x<1280;x++){
+            let pxl= c.getImageData(x, y, 1, 1);
+            let pxldata=pxl.data;
+            if(pxldata[0]===0 && pxldata[1]===0 && pxldata[1]===0 ){
+                continue;
+            }
+            let rdiff=Math.abs(parseInt(colors[0])-pxldata[0]);
+            let gdiff=Math.abs(parseInt(colors[1])-pxldata[1]);
+            let bdiff=Math.abs(parseInt(colors[2])-pxldata[2]);
+            if(rdiff>50 && gdiff>50 && bdiff>50){
+                pxldata[0]=0;
+                pxldata[1]=0;
+                pxldata[2]=0;
+            }
+            else{
+                pxldata[0]=colors[0];
+                pxldata[1]=colors[1];
+                pxldata[2]=colors[2];
+            }
+            c.putImageData(pxl,x+1,y+1)
+
+        }
+    }
+
+
+}
+function drawSingleMark(coordinateList,color){
+    c.beginPath();
+    c.setTransform(zoomValue,0,0, zoomValue,-img.zoomMinX*zoomValue,-img.zoomMinY*zoomValue);
+
+    //c.fillRect(coordinateList[0][0]-5/zoomValue, coordinateList[0][1]-5/zoomValue, 10/zoomValue, 10/zoomValue);
+
+    //c.arc(coordinateList[0][0], coordinateList[0][1], 10/zoomValue, 0, 2*Math.PI);
+    c.moveTo(coordinateList[0][0], coordinateList[0][1]);
+    canvasFloat.innerHTML="";
+    for (y = 0; y <coordinateList.length; y++) {
+        c.lineTo(coordinateList[y][0], coordinateList[y][1]);
+    }
+    c.closePath();
+    c.imageSmoothingEnabled = false;
+    c.fillStyle=color
+    c.fill();
+
+}
 function drawMarking(){
     if(drawingList[imageIndex]==null){
         return
@@ -108,15 +207,18 @@ function drawMarking(){
         c.lineWidth=1/zoomValue;
         c.strokeStyle=drawingList[imageIndex][i].color;
         c.setTransform(zoomValue,0,0, zoomValue,-img.zoomMinX*zoomValue,-img.zoomMinY*zoomValue);
+        c.translate(0.5, 0.5)
         let coordinateList=drawingList[imageIndex][i].coordinates[0];
         c.moveTo(coordinateList[0][0], coordinateList[0][1]);
         for (y = 1; y <coordinateList.length; y++) {
+            c.imageSmoothingEnabled = false;
             c.lineTo(coordinateList[y][0], coordinateList[y][1]);
 
-            c.stroke();
+            //c.stroke();
         }
         if(drawingList[imageIndex][i].finished){
             //c.closePath();
+            c.imageSmoothingEnabled = false;
             c.fillStyle=drawingList[imageIndex][i].color;
             c.fill();
         }

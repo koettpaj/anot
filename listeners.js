@@ -15,7 +15,7 @@ canvas.addEventListener('mousedown', function(event) {
     //drawImg()
 
 });
-canvas.addEventListener('contextmenu', event => event.preventDefault());
+//canvas.addEventListener('contextmenu', event => event.preventDefault());
 
 
 thead.addEventListener('contextmenu', function(e){
@@ -99,6 +99,10 @@ canvas.addEventListener('mousemove', function(event) {
         latestMove=[event.layerX,event.layerY];
     }
 
+    if(zoomBox){
+        renderZoom(event)
+    }
+
     if(isDrawing && currentTool==="select"){
         drawImg();
         drawMarking();
@@ -122,11 +126,29 @@ saveBtn.addEventListener("click", function(){
 
 
 document.addEventListener('keydown', function(event) {
-    const key = event.key; // "a", "1", "Shift", etc.
 
+    const key = event.key; // "a", "1", "Shift", etc.
+    console.log(key);
     let index=imageIndex;
+    if(key==="ArrowRight"){
+        if(imageIndex<files.length){
+
+        slider.value=imageIndex+1;
+        sliderChange(imageIndex+1);
+    }}
+    if(key==="ArrowLeft"){
+        if(imageIndex>0){
+            slider.value=imageIndex-1;
+            sliderChange(imageIndex-1);
+        }}
+
+
     if(key==="a"){
         prevVIP(index)
+    }
+
+    if(key==="b"){
+        zoomBoxa.click();
     }
     else if(key==="d"){
         nextVIP(index)}

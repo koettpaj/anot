@@ -1,19 +1,24 @@
-const canvas = document.querySelector('canvas');
+const canvas = document.getElementById('canvas');
 const zoom = document.getElementById('zoom');
 $("#messageBox").hide();
 $("#messageBoxInput").hide();
 $("#messageBoxInputLayer").hide();
 $("#messageBoxInputLayerPaste").hide();
+$("#zoomCanvas").hide();
 
 const slider =document.getElementById('myRange');
 let zoomValue=1;
-
-
+slider.addEventListener("keydown", function(e){
+    e.preventDefault();
+})
+const additionalTools =document.getElementById('additionalTools');
 const zoomIcon =document.getElementById('zoomIcon');
 const moveIcon =document.getElementById('moveIcon');
 const selectIcon =document.getElementById('selectIcon');
-
+const zoomCanvas = document.getElementById('zoomCanvas');
 const vipLoad = document.getElementById('vipLoad');
+const zoomBoxa=document.getElementById("zoomBoxa")
+
 //canvas.addEventListener("wheel", wheelZoom);
 let imageIndex=0;
 let leftMouseDown=false;
@@ -51,9 +56,12 @@ const layerList=document.getElementById("layerList");
 const tbody=document.getElementById("tbodyInsert");
 const canvasFloat=document.getElementById("canvasFloat");
 let rect = canvas.getBoundingClientRect();
+let zoomBox=false;
 canvasFloat.style.top=rect.top+"px";
 canvasFloat.style.left=rect.left+"px";
 canvas.style.cursor = "pointer";
+additionalTools.style.top=rect.top+"px";
+additionalTools.style.left=rect.right+"px";
 let boxBeingDragged=null;
 let zindex=15;
 let objectBeingAltered=null;
@@ -64,6 +72,8 @@ window.addEventListener('resize', function(){
     let rect = canvas.getBoundingClientRect();
     canvasFloat.style.top=rect.top+"px";
     canvasFloat.style.left=rect.left+"px";
+    additionalTools.style.top=rect.top+"px";
+    additionalTools.style.left=rect.right+"px";
 }, true);
 function translate(xdiff,ydiff, callback=null){
 
