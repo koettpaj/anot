@@ -127,15 +127,24 @@ function downloadImage()
 }
 
 
+
+
 function exportImage(index){
+
     zoomValue=1;
     drawImg();
     c.fillStyle = "#000000";
     c.fillRect(0, 0, canvas.width, canvas.height);
-    let objIndex;
-    for(objIndex=0; objIndex<drawingList[index].length;objIndex++){
-        let imageData=removeAA(drawingList[index][objIndex].coordinates[0],drawingList[index][objIndex].color)
-    }
+    drawMarking();
+    let zip = new JSZip();
+    let imgdir = zip.folder("images");
+    let imgdata=c.getImageData(0,0,1280,480);
+    imgdir.file("test1.png", imgdata, {base64: true});
+    zip.generateAsync({type:"blob"})
+        .then(function(content) {
+            // see FileSaver.js
+            saveAs(content, "example.zip");
+        });
 
 }
 
@@ -163,7 +172,7 @@ function removeAA(listpath, color){
                 pxldata[1]=colors[1];
                 pxldata[2]=colors[2];
             }
-            c.putImageData(pxl,x+1,y+1)
+            c.putImageData(pxl,x,y)
 
         }
     }
@@ -171,6 +180,7 @@ function removeAA(listpath, color){
 
 }
 function drawSingleMark(coordinateList,color){
+    c.filter ='url(#remove-alpha)';
     c.beginPath();
     c.setTransform(zoomValue,0,0, zoomValue,-img.zoomMinX*zoomValue,-img.zoomMinY*zoomValue);
 
@@ -189,6 +199,7 @@ function drawSingleMark(coordinateList,color){
 
 }
 function drawMarking(){
+    c.filter = 'url(#remove-alpha)';
     if(drawingList[imageIndex]==null){
         return
     }
@@ -429,6 +440,9 @@ function copyAll(){
         if(drawingList[i]==null){
             drawingList[i]=[]
         }
+        if(i===imageIndex){
+            continue;
+        }
         drawingList[i].push(obj);
     }
     $('#messageBoxInputLayer')
@@ -437,14 +451,14 @@ function copyAll(){
     alertMessage("n00t säger:","Kopierade masken till "+files.length+" bilder.","positive",5000);
 }
 
-function alertMessageInput(event){
+function alertMessageInput(event,edit){
 
 
 
 
     messageBoxInput.style.top=event.y+"px";
     messageBoxInput.style.left=event.x+"px";
-
+    editColor=edit;
     //messageHeader.innerHTML=header;
     //messageP.innerHTML=msg;
     $('#messageBoxInput')

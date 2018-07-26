@@ -43,7 +43,7 @@ const messageBoxInputLayer = document.getElementById("messageBoxInputLayer");
 const messageBoxInputLayerPaste = document.getElementById("messageBoxInputLayerPaste");
 const thead= document.getElementById("thead");
 const saveBtn= document.getElementById("save");
-
+let editColor=null;
 let drawingList=[];
 let numWorkers=0;
 let currentColor=null;
@@ -66,6 +66,10 @@ let boxBeingDragged=null;
 let zindex=15;
 let objectBeingAltered=null;
 let showAll=true;
+
+
+
+let rowTarget=null;
 
 $("#canvasFloat").hide();
 window.addEventListener('resize', function(){
@@ -426,18 +430,21 @@ function updateTable(obj){
 
     let name = document.createElement("td");
     let nameField = document.createElement("div");
-    nameField.className="ui inverted transparent input"
+    nameField.className="ui inverted transparent input";
     let inputF = document.createElement("input");
-    inputF.type="text"
-    inputF.placeholder=obj.name
+    inputF.type="text";
+    inputF.placeholder=obj.name;
 
     inputF.addEventListener("blur", function(e){
         obj.name=inputF.value;
     });
     let type = document.createElement("td");
-
+    type.className="center aligned selectable";
+    type.addEventListener("click", function(event){
+        alertMessageInput(event, obj)
+    })
     let image = document.createElement("i");
-    image.className=obj.logo
+    image.className=obj.logo;
 
     let edit = document.createElement("td");
     edit.className="center aligned selectable";
@@ -488,12 +495,29 @@ function updateTable(obj){
     type.appendChild(image);
     deleteSpace.appendChild(deleteimage);
 
-
+    $(tr).data( "obj", obj );
+    tr.draggable=true;
     tr.appendChild(view);
     tr.appendChild(name);
     tr.appendChild(type);
     tr.appendChild(edit);
     tr.appendChild(deleteSpace);
+
+
+    tr.addEventListener("dragenter", function(e){
+        rowTarget=$(tr).data( "obj");
+    });
+    tr.addEventListener("dragend", function(e){
+        let index1 = drawingList[imageIndex].indexOf($(tr).data( "obj"));
+        let index2 = drawingList[imageIndex].indexOf(rowTarget);
+        drawingList[imageIndex][index1]=rowTarget;
+        drawingList[imageIndex][index2]=$(tr).data( "obj");
+        drawImg();
+        drawMarking();
+        updateWholeTable();
+    });
+
+    tr.style.over="border: 2px dashed #000";
 
     tbody.appendChild(tr);
 }
@@ -639,6 +663,15 @@ function colorSelectedFinal(){
     ;
    $('#messageBoxInput').transition('fade')
    ;
+
+    if(editColor!=null){
+        editColor.color=color;
+        editColor.logo=icon;
+        updateWholeTable();
+        drawImg();
+        drawMarking();
+        return
+    }
     newPath(latestEvent, icon);
 
 }
