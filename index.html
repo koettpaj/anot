@@ -12,7 +12,7 @@
 
         #canvas {
 
-            background-image: url("pattern.png");
+            background-image: url("assets/pattern.png");
             background-repeat: repeat;
             height: 480px;
             width: 1280px;
@@ -168,25 +168,22 @@
             position:absolute;
             z-index:15;
         }
+        .noAlpha{
+
+            -webkikt-filter: url('#remove-alpha');
+            filter: url('#remove-alpha');
+        }
 
 
 
     </style>
-    <script type="text/javascript" src="jszip.min.js"></script>
-    <script src="controllers.js"></script>
+    <script type="text/javascript" src="assets/jszip.min.js"></script>
+    <script src="assets/controllers.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></script>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute;z-index:-1;">
-    <defs>
-        <filter id="remove-alpha" x="0" y="0" width="100%" height="100%" >
-            <feComponentTransfer>
-                <feFuncA type="discrete" tableValues="0 1"></feFuncA>
-            </feComponentTransfer>
-        </filter>
-    </defs>
-</svg>
+
 
 <div class="ui inverted vertical compact menu" id="additionalTools" onclick="zoomBoxToggle(event)">
     <a class="item" id="zoomBoxa">
@@ -273,7 +270,7 @@
         <div class ="row" id="header">
             <div class="three wide column">
 
-                    <img id="titleImg" class="ui tiny image" src="noot_beta_small.png"/>
+                    <img id="titleImg" class="ui tiny image" src="assets/noot_beta_small.png"/>
 
             </div>
             <div class="ten wide center aligned column">
@@ -329,7 +326,7 @@
                                 <i class="save outline icon"></i>
                                 Spara
                             </a>
-                            <a class="item">
+                            <a class="item" id="export">
                                 <i class="images outline icon"></i>
                                 Exportera
                             </a>
@@ -427,7 +424,7 @@
     <script>var files;</script>
     <script>//var vip;</script>
 
-    <script src="canvas.js"></script>
-    <script src="listeners.js"></script>
+    <script src="assets/canvas.js"></script>
+    <script src="assets/listeners.js"></script>
 </body>
 </html>
