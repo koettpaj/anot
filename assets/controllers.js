@@ -5,13 +5,23 @@ function sliderChange(value){
 }
 
 function loadImage(index){
+    //console.log("Reading "+files[parseInt(index)-1].name);
+    reader.readAsDataURL(files[parseInt(index)-1]);
+    imageIndex=parseInt(index);
 
-    reader.readAsDataURL(files[index-1]);
-    imageIndex=index;
+}
+
+function sliderContrast(value){
+    contrast=value;
+    drawImg();
+    drawMarking();
 
 }
 
 
+function sleep (time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+}
 
 function getVIP(){
     canvasVIP=[];
@@ -89,14 +99,35 @@ function zoomBoxToggle(e){
 }
 
 function drawImg(){
+    imageName.innerHTML=imageIndex;
+    //console.log("Drawing "+files[imageIndex].name);
+    if(textVIP.includes(imageIndex)){
+        imageName.style.color="red";
+    }
+    else{
+        imageName.style.color="yellow";
+    }
+
+    if(zoomValue<1.1){
+        imageName.style.display="none";
+    }
+    else{
+        imageName.style.display="block";
+    }
     canvas.width = img.width;
     canvas.height = img.height;
     c.imageSmoothingEnabled = false;
+    if(contrast!==100){
+        c.filter="contrast("+contrast+"%)";
+    }
+
+    c2.imageSmoothingEnabled = false;
     //c.scale(zoomValue, zoomValue)
     //c.drawImage(img,0,0,1282,482);
 
     //console.log("image dimensions: "+img.zoomMinX+" "+img.zoomMinY+" "+img.zoomWidthX+" "+img.zoomWidthY+" zv: "+zoomValue);
     c.drawImage(img,img.zoomMinX,img.zoomMinY,img.zoomWidthX,img.zoomWidthY,0,0,1280,480);
+
 
 
     //c.drawImage(img, img.width / zoom, img.height / zoom, img.width / zoom, img.height / zoom, 0, 0, canvas.width, canvas.height);
@@ -127,47 +158,93 @@ function downloadImage()
 }
 
 function exportImages(){
+    zoomValue=1.0000;
+    resetZoom();
+
     let zip = new JSZip();
     let imgdir = zip.folder("images");
+    imgdir = zip.folder("images");
+
     for(let i=0;i<textVIP.length;i++){
-        if(drawingList[textVIP[i]]!==undefined){
-            let imgdata=exportImage(textVIP[i])
-            imgdir.file(files[textVIP[i]].name, imgdata, {base64: true});
+        if(drawingList[indexDict[textVIP[i]]+1]!==undefined){
+
+            let imgdata=exportImage(indexDict[textVIP[i]+1]);
+            let name="";
+            if(files[indexDict[textVIP[i]]]==="undefined"){
+                name="no_name_"+drawingList[indexDict[textVIP[i]]]+".png";
+            }
+            else{
+                name=files[indexDict[textVIP[i]]].name;
+            }
+
+            imgdir.file(name, imgdata, {base64: true});
+
+
+
 
         }
 
     }
-    zip.generateAsync({type:"base64"}).then(function (base64) {
+    zip.generateAsync({type:"blob"})
+        .then(function (blob) {
+            saveAs(blob, projectName+".zip");
+        });
+
+    /*
+    zip.generate({type:"base64"}).then(function (base64) {
         window.location = "data:application/zip;base64," + base64;
     });
+       */
+
 
 }
 
 
 function exportImage(index){
-
+    /*
+    if(drawingList[index]===null){
+        alert("Missing data for img: "+index);
+    }*/
+    console.log(index);
     let layers=[];
-    zoomValue=1;
-    dragZoom(-1);
+    zoomValue=1.0000;
     translate(0,0);
-    drawImg();
+    resetZoom();
+
     c.clearRect(0, 0, 1280, 480);
     drawMarking();
-
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c2.setTransform(1, 0, 0, 1, 0, 0);
     for(let objIndex=0;objIndex<drawingList[index].length; objIndex++){
 
         c.clearRect(0, 0, 1280, 480);
         drawSingleMark(drawingList[index][objIndex].coordinates[0],drawingList[index][objIndex].color);
         let imageData=c.getImageData(0,0,1280,480);
+
+
         for(let i=3;i<imageData.data.length;i+=4){
-            if((imageData.data[i-1]+imageData.data[i-2]+imageData.data[i-3])>0){
-                imageData.data[i]=255
+            if(imageData.data[i-1]!==255 && imageData.data[i-1]!==128){
+                imageData.data[i-1]=0;
             }
+            if(imageData.data[i-2]!==255 && imageData.data[i-2]!==128){
+                imageData.data[i-2]=0;
+            }
+            if(imageData.data[i-3]!==255 && imageData.data[i-3]!==128){
+                imageData.data[i-3]=0;
+            }
+
+            if(imageData.data[i-1]+imageData.data[i-2]+imageData.data[i-3]>0){
+                imageData.data[i]=255;
+            }
+
+
         }
+        //console.log(objIndex+ " hoho");
         layers.push(imageData)
     }
     c.fillStyle = '#000000';
     c.fillRect(0,0,1280,480)
+
     for(let layerIndex=0; layerIndex<layers.length;layerIndex++){
 
         c2.putImageData(layers[layerIndex],0,0);
@@ -175,8 +252,15 @@ function exportImage(index){
     }
 
 
-
-    c.putImageData(createDarkness(), 640,0);
+    if(sideChosen==="left"){
+        c.putImageData(createDarkness(), 640,0);
+    }
+    else if(sideChosen==="right"){
+        c.putImageData(createDarkness(), 0,0);
+    }
+    else{
+        alert("No side chosen for export. Try setting it programmatically and try again.")
+    }
 
 
 
@@ -265,7 +349,7 @@ function drawMarking(){
         c.lineWidth=1/zoomValue;
         c.strokeStyle=drawingList[imageIndex][i].color;
         c.setTransform(zoomValue,0,0, zoomValue,-img.zoomMinX*zoomValue,-img.zoomMinY*zoomValue);
-        c.translate(0.5, 0.5)
+        //c.translate(0.5, 0.5)
         let coordinateList=drawingList[imageIndex][i].coordinates[0];
         c.moveTo(coordinateList[0][0], coordinateList[0][1]);
         for (y = 1; y <coordinateList.length; y++) {
@@ -484,19 +568,19 @@ function copyOne(e){
 
 function copyAll(){
     let obj = $('#messageBoxInputLayer').data("selected");
-    for(let i=0; i<files.length;i++){
-        if(drawingList[i]==null){
-            drawingList[i]=[]
+    for(let i=0; i<textVIP.length;i++){
+        if(drawingList[indexDict[textVIP[i]]+1]==null){
+            drawingList[indexDict[textVIP[i]]+1]=[]
         }
-        if(i===imageIndex){
+        if(textVIP[i]===imageIndex){
             continue;
         }
-        drawingList[i].push(obj);
+        drawingList[indexDict[textVIP[i]]+1].push(obj);
     }
     $('#messageBoxInputLayer')
         .transition('slide right')
     ;
-    alertMessage("n00t säger:","Kopierade masken till "+files.length+" bilder.","positive",5000);
+    alertMessage("n00t säger:","Kopierade masken till "+textVIP.length+" bilder.","positive",5000);
 }
 
 function alertMessageInput(event,edit){

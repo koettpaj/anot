@@ -82,8 +82,17 @@
 
 
         #menu{
+
                   overflow: hidden;
             top:36px;
+        }
+
+        #menu2{
+
+            position:relative;
+            width:100px;
+            overflow: hidden;
+            top:68px;
         }
         #moveme{
             position: relative;
@@ -174,15 +183,41 @@
             filter: url('#remove-alpha');
         }
 
+        #leftOrRight{
+
+            position:absolute;
+            z-index:50;
+            left:46%;
+            top:25%;
+        }
+
+        #imageName{
+            position:absolute;
+            z-index:35;
+            left:120px;
+            top:14px;
+        }
+
+        .ui.vertical.inverted.menu .item:before {
+            background: transparent;
+        }
 
 
     </style>
+    <script type="text/javascript" src="assets/FileSaver.js"></script>
     <script type="text/javascript" src="assets/jszip.min.js"></script>
     <script src="assets/controllers.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></script>
 </head>
 <body>
+
+<div class="ui buttons" id="leftOrRight">
+    <button class="ui blue button" id="leftSide">Left</button>
+    <div class="or"></div>
+    <button class="ui button" id="rightSide">Right</button>
+</div>
+
 
 
 <div class="ui inverted vertical compact menu" id="additionalTools" onclick="zoomBoxToggle(event)">
@@ -264,7 +299,7 @@
         </div>
     </div>
 
-
+<h3 class="ui header" id="imageName"></h3>
 
     <div class="ui stackable grid">
         <div class ="row" id="header">
@@ -274,6 +309,7 @@
 
             </div>
             <div class="ten wide center aligned column">
+
             <div class="ui center aligned inverted horizontal compact menu" id="toolActive">
 
                 <a class="item">
@@ -288,6 +324,9 @@
 
 
             </div>
+            </div>
+            <div class="three wide column">
+
             </div>
 
         </div>
@@ -307,7 +346,7 @@
 
                                 <i class="file image outline icon"></i>
                                 Ladda in
-                                <input name="files[]" type="file" id="fileLoad" style="display:none" webkitdirectory directory multiple/>
+                                <input name="filesInput[]" type="file" id="fileLoad" style="display:none" webkitdirectory directory multiple/>
 
                             </a>
                             </label>
@@ -320,10 +359,8 @@
 
                                 </a>
                             </label>
-
-
                             <a class="item" id="save">
-                                <i class="save outline icon"></i>
+                                <i class="save outline icon" ></i>
                                 Spara
                             </a>
                             <a class="item" id="export">
@@ -339,6 +376,14 @@
 
                             </a>
                             </label>
+
+                            <a class="item">
+                                <i class="lightbulb alternate outline icon" style="position:relative;top:5px;"></i>
+                                <input type="range" oninput="sliderContrast(this.value)" min="100" max="300" value="100">
+
+                            </a>
+
+
 
 
 
@@ -369,7 +414,38 @@
 
                 </div>
 
-            <div class="two wide column">
+            <div class="two wide inverted column" id="menu2">
+                <div class="ui tiny left aligned white header" style="color:white;margin:5px">Key-Bindings</div>
+                <div class="ui labeled input">
+                    <div style="background-color: #343434;margin:5px;" class="ui inverted label">
+                        <i class="search icon"></i>
+                    </div>
+                    <input maxlength="1" style="width:50px;background-color: #343434;margin:5px;color:white;" type="text" value="z"  id="zoomKeyBinding">
+                </div>
+                <div class="ui labeled input">
+                    <div style="background-color: #343434;margin:5px;" class="ui inverted label">
+                        <i class="paint brush icon"></i>
+                    </div>
+                    <input maxlength="1" style="width:50px;background-color: #343434;margin:5px;color:white;" type="text" value="v"  id="selectKeyBinding">
+                </div>
+                <div class="ui labeled input">
+                    <div style="background-color: #343434;margin:5px;" class="ui inverted label">
+                        <i  class="angle double right icon"></i>
+                    </div>
+                    <input maxlength="1" style="width:50px;background-color: #343434;margin:5px;color:white;" type="text" value="d"  id="nextKeyBinding">
+                </div>
+                <div class="ui labeled input" >
+                    <div style="background-color: #343434;margin:5px;" class="ui inverted label">
+                        <i  class="angle double left icon"></i>
+                    </div>
+                    <input maxlength="1" style="width:50px;background-color: #343434;margin:5px;color:white;" type="text" value="a" id="prevKeyBinding">
+                </div>
+                <div class="ui labeled input" >
+                    <div style="background-color: #343434;margin:5px;" class="ui inverted label">
+                        <i class="expand icon"></i>
+                    </div>
+                    <input maxlength="1" style="width:50px;background-color: #343434;margin:5px;color:white;" type="text" value="b" id="zoomBoxKeyBinding">
+                </div>
 
             </div>
 
@@ -396,7 +472,7 @@
     <div class="ui grid">
         <div class="row">
         <div class="two wide column"></div>
-            <div class="twelve wide column">
+            <div class="twelve wide column" style="overflow-y:scroll;height:400px">
                 <table class="ui selectable inverted fixed table" id="layerList">
                 <thead id="thead">
                 <tr>
@@ -420,8 +496,9 @@
         </div>
     </div>
 
+
     <sript src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></sript>
-    <script>var files;</script>
+
     <script>//var vip;</script>
 
     <script src="assets/canvas.js"></script>

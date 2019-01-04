@@ -5,12 +5,16 @@ $("#messageBoxInput").hide();
 $("#messageBoxInputLayer").hide();
 $("#messageBoxInputLayerPaste").hide();
 $("#zoomCanvas").hide();
-
+let version="0.0.1";
 const slider =document.getElementById('myRange');
 let zoomValue=1;
 slider.addEventListener("keydown", function(e){
     e.preventDefault();
 })
+let indexDict = {};
+let indexDictReverse = {};
+let filesInput = null;
+let files = new Array();
 const additionalTools =document.getElementById('additionalTools');
 const zoomIcon =document.getElementById('zoomIcon');
 const moveIcon =document.getElementById('moveIcon');
@@ -18,8 +22,15 @@ const selectIcon =document.getElementById('selectIcon');
 const zoomCanvas = document.getElementById('zoomCanvas');
 const vipLoad = document.getElementById('vipLoad');
 const zoomBoxa=document.getElementById("zoomBoxa")
-
+let sideChosen="left";
 //canvas.addEventListener("wheel", wheelZoom);
+let zoomKeyBinding = document.getElementById("zoomKeyBinding");
+let selectKeyBinding = document.getElementById("selectKeyBinding");
+let nextKeyBinding = document.getElementById("nextKeyBinding");
+let prevKeyBinding = document.getElementById("prevKeyBinding");
+let zoomBoxKeyBinding = document.getElementById("zoomBoxKeyBinding");
+let leftOrRight = document.getElementById("leftOrRight");
+let projectName="";
 let imageIndex=0;
 let leftMouseDown=false;
 let  rightMouseDown=false;
@@ -56,6 +67,7 @@ let toCopy=null;
 const layerList=document.getElementById("layerList");
 const tbody=document.getElementById("tbodyInsert");
 const canvasFloat=document.getElementById("canvasFloat");
+let imageName= document.getElementById('imageName');
 let rect = canvas.getBoundingClientRect();
 let zoomBox=false;
 canvasFloat.style.top=rect.top+"px";
@@ -63,15 +75,18 @@ canvasFloat.style.left=rect.left+"px";
 canvas.style.cursor = "pointer";
 additionalTools.style.top=rect.top+"px";
 additionalTools.style.left=rect.right+"px";
+imageName.style.top=rect.top-50+"px";
+imageName.style.left=rect.left+400+"px";
 let boxBeingDragged=null;
 let zindex=15;
 let objectBeingAltered=null;
 let showAll=true;
 let canvas2=document.createElement("canvas");
+let contrast=100;
 canvas2.width=1280;
 canvas2.height=480;
 let c2=canvas2.getContext("2d")
-
+$('#leftOrRight').hide();
 
 
 let rowTarget=null;
@@ -127,26 +142,40 @@ function translate(xdiff,ydiff, callback=null){
 
 
 }
-function prevVIP(index){
-    for (i = index; i >= 0; i--) {
+function prevVIP(index2){
 
+    let index=indexDictReverse[index2];
+
+    if(index===textVIP[0]+1){
+        console.log("BREAK?");
+        return;
+    }
+    console.log("BREAK!");
+
+    for (i = textVIP.length-1; i >= 0; i--) {
+        console.log("Comparing: "+index+" and "+textVIP[i]);
         if(index>textVIP[i]){
-
-            slider.value=textVIP[i];
-            sliderChange(textVIP[i]);
+            console.log("SWAPPING TO "+textVIP[i]+" ("+indexDict[textVIP[i]+1]+")");
+            slider.value=indexDict[textVIP[i-1]+1];
+            sliderChange(indexDict[textVIP[i-1]+1]);
             return;
         }
     }
 }
 
 
-function nextVIP(index){
+function nextVIP(index2){
+
+    let index=indexDictReverse[index2];
+    if(index===textVIP[textVIP.length-1]){
+        return;
+    }
     for (i = 0; i < textVIP.length; i++) {
 
         if(index<textVIP[i]){
 
-            slider.value=textVIP[i];
-            sliderChange(textVIP[i]);
+            slider.value=indexDict[textVIP[i]+1];
+            sliderChange(indexDict[textVIP[i]+1]);
             return;
         }
     }
@@ -178,6 +207,14 @@ function centerImage(xdiff,ydiff){
 
 }
 
+function resetZoom(){
+    img.zoomMinX= 0;
+    img.zoomMinY= 0;
+    img.zoomWidthX = 1280;
+    img.zoomWidthY = 480;
+    drawImg();
+    drawMarking();
+}
 
 
 function dragZoom(diff){
@@ -212,13 +249,13 @@ function dragZoom(diff){
     let xWidth=1280;
     let yWidth=480;
 
-    if(diff<0 &&zoomValue<8){
+    if(diff<0 &&zoomValue<20){
         canvas.style.cursor = "zoom-in";
         let x=startZoom[0]
         let y=startZoom[1]
         zoomValue+=Math.abs(diff/200*zoomValue);
-        if(zoomValue>8){
-            zoomValue=8;
+        if(zoomValue>20){
+            zoomValue=20;
         }
         xMin=(((x)-(1280/(zoomValue*2))));
         yMin=(y-(480/(zoomValue*2)));
@@ -281,8 +318,8 @@ function dragZoom(diff){
 
 
 function mapRange(xTrue,yTrue){
-    var relX=Math.round((parseInt(xTrue)/1280)*(img.zoomWidthX)+img.zoomMinX);
-    var relY=Math.round((parseInt(yTrue)/480)*(img.zoomWidthY)+img.zoomMinY);
+    var relX=Math.round(((xTrue)/1280)*(img.zoomWidthX)+img.zoomMinX);
+    var relY=Math.round(((yTrue)/480)*(img.zoomWidthY)+img.zoomMinY);
     console.log(relX + "and "+relY);
     return [relX, relY];
 
@@ -290,8 +327,8 @@ function mapRange(xTrue,yTrue){
 }
 
 function mapRangeFloat(xTrue,yTrue){
-    var relX=Math.round((parseInt(xTrue)/1480)*(img.zoomWidthX)+img.zoomMinX);
-    var relY=Math.round((parseInt(yTrue)/528)*(img.zoomWidthY)+img.zoomMinY);
+    var relX=Math.round(((xTrue)/1480)*(img.zoomWidthX)+img.zoomMinX);
+    var relY=Math.round(((yTrue)/528)*(img.zoomWidthY)+img.zoomMinY);
     console.log(relX + "and "+relY);
     return [relX, relY];
 
@@ -302,11 +339,12 @@ function mapRangeFloat(xTrue,yTrue){
 
 const c = canvas.getContext('2d');
 c.imageSmoothingEnabled = false;
+c2.imageSmoothingEnabled = false;
 const img = new Image();
 
 const reader = new FileReader();
 reader.onload = function (){
-
+    //console.log(reader.result)
     img.onload=function(){
         drawImg();
         drawMarking();
@@ -333,22 +371,58 @@ function handleProjectSelect(evt){
         let contents = reader4.result;
         drawingList=JSON.parse(contents)
         alertMessage("n00t säger:","Öppnade projekt!","positive",5000);
-    }
+    };
 
     reader4.readAsText(file[0]);
 }
 
 function handleFileSelect(evt) {
-    console.log("hello")
-    console.log(evt)
-    files = evt.target.files;// FileList object
-    slider.setAttribute("max", files.length.toString())
-    console.log(files);
-    alertMessage("n00t säger:","Laddade in "+files.length+" bilder.","positive","5000");
+    console.log("hello");
+    console.log(evt);
+    let filesInput = evt.target.files;// FileList object
+    slider.setAttribute("max", filesInput.length.toString());
+    console.log(filesInput);
+    alertMessage("n00t säger:","Laddade in "+filesInput.length+" bilder.","positive","5000");
+    projectName = filesInput[0].name.substring(0,filesInput[0].name.indexOf("#"));
+    //files[0].what="hehe";
+    for(let i=0;i<filesInput.length;i++){
+        console.log(i);
+        files[i]=filesInput[i];
+        hashindex=filesInput[i].name.indexOf("#");
+        files[i].realIndex=parseInt(files[i].name.substr(hashindex+1));
+        indexDict[parseInt(files[i].name.substr(hashindex+1))]=i;
+        indexDictReverse[i]=parseInt(files[i].name.substr(hashindex+1));
+
+
+    }
 
     loadImage(1)
 
 }
+
+function getRealIndex(index){
+
+}
+
+function handleLeft(){
+    sideChosen="left";
+    exportImages();
+    $('#leftOrRight')
+        .transition('swing left')
+    ;
+
+}
+
+function handleRight(){
+    sideChosen="right";
+    exportImages();
+    $('#leftOrRight')
+        .transition('swing right')
+    ;
+
+}
+
+
 function handleVIPSelect(evt) {
     console.log(evt)
     file = evt.target.files;// FileList object
@@ -359,7 +433,7 @@ function handleVIPSelect(evt) {
         let res = contents.split(".png");
         res.splice(-1,1)
         for (index in res){
-            hashindex=res[index].indexOf("#")
+            let hashindex=res[index].indexOf("#")
             res[index]=parseInt(res[index].substr(hashindex+1));
         }
         textVIP=res;

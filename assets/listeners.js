@@ -8,14 +8,14 @@ canvas.addEventListener('mousedown', function(event) {
 
         rightMouseDown=true;
     }
-    event.preventDefault()
+    //event.preventDefault()
     //console.log(event);
     //c.rect(event.layerX,event.layerY,150,100);
     //c.stroke();
     //drawImg()
 
 });
-//canvas.addEventListener('contextmenu', event => event.preventDefault());
+canvas.addEventListener('contextmenu', event => event.preventDefault());
 
 
 thead.addEventListener('contextmenu', function(e){
@@ -124,7 +124,11 @@ saveBtn.addEventListener("click", function(){
 });
 
 exportBtn.addEventListener("click", function(){
-    exportImages();
+    $('#leftOrRight')
+        .transition('swing left')
+    ;
+
+    //exportImages();
 })
 
 
@@ -147,20 +151,20 @@ document.addEventListener('keydown', function(event) {
         }}
 
 
-    if(key==="a"){
+    if(key===prevKeyBinding.value){
         prevVIP(index)
     }
 
-    if(key==="b"){
+    if(key===zoomBoxKeyBinding.value){
         zoomBoxa.click();
     }
-    else if(key==="d"){
+    else if(key===nextKeyBinding.value){
         nextVIP(index)}
 
-    else if(key==="z"){
+    else if(key===zoomKeyBinding.value){
         $('#zoomIcon').click();
         }
-    else if(key==="v"){
+    else if(key===selectKeyBinding.value){
         $('#selectIcon').click();
     }
 
@@ -179,6 +183,8 @@ document.addEventListener('keydown', function(event) {
 document.getElementById('fileLoad').addEventListener('change', handleFileSelect, false);
 document.getElementById('vipLoad').addEventListener('change', handleVIPSelect, false);
 document.getElementById('load').addEventListener('change', handleProjectSelect, false);
+document.getElementById('leftSide').addEventListener('click', handleLeft, false);
+document.getElementById('rightSide').addEventListener('click', handleRight, false);
 document.getElementById('canvasFloat').addEventListener('click', removeCanvasFloat, false);
 var toolUsedBtns =document.querySelectorAll('#toolActive a');
 for(var i=0, len=toolUsedBtns.length; i < len; i++){toolUsedBtns[i].addEventListener('click', toolSelected)};
